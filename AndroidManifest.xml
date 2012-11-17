@@ -13,7 +13,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".Gateway"
-            android:label="@string/title_activity_gateway" >
+            android:label="@string/title_activity_gateway" 
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

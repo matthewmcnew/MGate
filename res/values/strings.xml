@@ -3,7 +3,8 @@
     <string name="app_name">AndroidGestures</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_gateway">AndroidGestures</string>
-    <color name="white">#000000</color>
+    <string name="title_activity_gateway">Gateway</string>
+    <color name="white">#FFFFFF</color>
+    
 
 </resources>
