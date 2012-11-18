@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.view.MotionEvent;
 
 
@@ -93,6 +94,15 @@ public class UnaryGate extends Gate {
 		literal = (literal+1)%2;
 	}
 	
+	public boolean inPath(Gate g) {
+		if(this == g) {
+			return true;
+		} else if(input == null) {
+			return false;
+		} else {
+			return (input.inPath(g));
+		}
+	}
 	
 	public boolean inputFlip(MotionEvent event) {
 		if(event.getX() > (x-35) && event.getX() < (x+22) ){
@@ -107,8 +117,10 @@ public class UnaryGate extends Gate {
 	public boolean snapWire(MotionEvent event, Gate selected) {
 		if(event.getX() > (x-35) && event.getX() < (x+22) ){
 			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()) ){
-				input = selected;
-				return true;
+				if(selected != this && !selected.inPath(this)) {
+					input = selected;
+					return true;
+				}
 			}
 		}
 		return false;
@@ -117,13 +129,21 @@ public class UnaryGate extends Gate {
 	
 	public void draw(Canvas c,ArrayList<Bitmap> circles) {
 		super.draw(c,circles);
+		
+		
 		if(!selected) {
-			if(input == null) {
+			Gateway.p("Not selected");
+			Gateway.p(input);
+			if(input == null || input.isDeleted()) {
+				input = null;
 				if(literal == 0) {
 					c.drawBitmap(circles.get(1), x-25, y + bitmap.getHeight()/2 - 12, null);
 				}else if(literal == 1) {
 					c.drawBitmap(circles.get(2), x-25, y + bitmap.getHeight()/2 - 12, null);
 				}
+			} else {
+				c.drawBitmap(circles.get(0), x-25, y + bitmap.getHeight()/2 - 12, null);
+				c.drawLine(x-25, y + bitmap.getHeight()/2, input.getOutputX(), input.getOutputY(), paint);
 			}
 			
 			if(getOutput() == 0) {
@@ -132,6 +152,11 @@ public class UnaryGate extends Gate {
 				c.drawBitmap(circles.get(4), x+bitmap.getWidth()-19, y + bitmap.getHeight()/2 - 12, null);
 			}
 			
+		} else {
+			if (input != null) {
+				c.drawBitmap(circles.get(0), x-25, y + bitmap.getHeight()/2 - 12, null);
+				c.drawLine(x-25, y + bitmap.getHeight()/2, input.getOutputX(), input.getOutputY(), paint);
+			}
 		}
 		
 	}

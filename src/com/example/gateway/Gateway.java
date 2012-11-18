@@ -45,10 +45,8 @@ public class Gateway extends Activity {
         float wireX,wireY;
         float beginX,beginY;
         
-
+        private Paint paint = new Paint();
         
-        private int currentOrange = -1;
-
 		public PlayAreaView(Context context) {       	
             super(context);
             loadImages();
@@ -56,19 +54,17 @@ public class Gateway extends Activity {
         }
 		
 		protected void onDraw(Canvas canvas) {
-		    Paint paint = new Paint();
 			drawMenu(canvas);
-
-		    
+			
 			if(modifyingOutputGate != null){
 				paint.setColor(Color.GREEN);
 				canvas.drawLine( beginX, beginY, wireX, wireY, paint);
 			}
+			
 		    
 		    for(Gate g : gates){
 		    	g.draw(canvas,circles);
-			}	
-
+			}
 
 		}
 		
@@ -145,15 +141,15 @@ public class Gateway extends Activity {
 						if(g.outputTouched(event)){
 							g.setWiring(true); 
 							modifyingOutputGate = g;
-							 
-							 
-							 beginX = g.getOutputX();
-							 beginY = g.getOutputY();
-							 
-							 wireX = event.getX();
-							 wireY = event.getY();
-							 this.invalidate();
-							 break;
+
+
+							beginX = g.getOutputX();
+							beginY = g.getOutputY();
+
+							wireX = event.getX();
+							wireY = event.getY();
+							this.invalidate();
+							break;
 						}
 					}	
 					
@@ -180,6 +176,11 @@ public class Gateway extends Activity {
 		        		
 		        		selected.setX(event.getX());
 		        		selected.setY(event.getY()); 
+		        		
+		        		if(modifyingOutputGate != null) {
+		        			beginX = modifyingOutputGate.getOutputX();
+		        			beginY = modifyingOutputGate.getOutputY();
+		        		}
 		        	}else if(modifyingOutputGate != null) {
 		        		wireX = event.getX();
 		        		wireY = event.getY();
@@ -188,24 +189,31 @@ public class Gateway extends Activity {
 		            // finger moves on the screen
 		            break;
 
-		        case MotionEvent.ACTION_UP: 
+		        case MotionEvent.ACTION_UP:
+		        	
+	        		if(modifyingOutputGate != null) {
+	        			for(Gate g : gates) {
+	        				p("Testing gate: "+g);
+	        				if(g.snapWire(event, modifyingOutputGate)) {	        					
+	        					break;
+	        				}
+	        			}
+    					modifyingOutputGate.setWiring(false);
+    					modifyingOutputGate = null;
+    					invalidate();
+	        		}
+	        		
 		        	if(selected != null){
 		        		if(selected.isDeleting()){
 		        			gates.remove(selected);
-		        		} else if(selected.isWiring()) {
-		        			for(Gate g : gates) {
-		        				if(g.snapWire(event, selected)) {
-		        					//selected.setWiring(false);
-		        					invalidate();
-		        					// TODO Snap to input nodes
-		        					break;
-		        				}
-		        			}
+		        			selected.setDeleted(true);
+		        			modifyingOutputGate = null;
 		        		}
 		        		
 		        		selected.flipSelected();
 		        		selected = null;
 		        	}
+	        		
 		        	this.invalidate();
 		        	
 //		            // finger leaves the screen
@@ -314,5 +322,9 @@ public class Gateway extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_gateway, menu);
         return true;
+    }
+    
+    public static void p(Object o) {
+    	System.out.println(o);
     }
 }

@@ -38,6 +38,10 @@ public class Input extends Gate {
 	public int getOutput() {
 		return out();
 	}
+	
+	public boolean inPath(Gate g) {
+		return false;
+	}
 
 	public ArrayList<Gate> getInputs() {
 		return null;

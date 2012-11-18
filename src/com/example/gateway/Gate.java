@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 public abstract class Gate {
 
 	public abstract int getOutput();
+	public abstract boolean inPath(Gate g);
 	public abstract Gate clone();
 	public abstract ArrayList<Gate> getInputs();
 	
@@ -22,8 +23,9 @@ public abstract class Gate {
 	protected boolean selected = false;
 	protected boolean deleting = false;
 	protected boolean wiring = false;
-	
-	protected static int outputnode1 = R.drawable.and;
+	protected boolean deleted = false;
+		
+	protected static Paint paint = new Paint();
 	
 	public void setInput(Gate g) {
 		System.out.print("Warning: gate does not take single input");
@@ -52,6 +54,7 @@ public abstract class Gate {
 	}
 	
 	public void draw(Canvas c,ArrayList<Bitmap> circles) {
+		Gateway.p("Drawing gate...");
 		if(deleting) {
 			Paint p = new Paint(Paint.FILTER_BITMAP_FLAG);
 			p.setFilterBitmap(true);
@@ -73,10 +76,12 @@ public abstract class Gate {
 	}
 	
 	public float getOutputX() {
+		Gateway.p("Getting output x...");
 		 return x+bitmap.getWidth()-6;
 	}
 	
 	public float getOutputY() {
+		Gateway.p("Getting output y...");
 		 return y + bitmap.getHeight()/2;	
 	}
 	
@@ -103,6 +108,9 @@ public abstract class Gate {
 	public void setDeleting(boolean b) {
 		deleting = b;
 	}
+	public void setDeleted(boolean b) {
+		deleted = b;
+	}
 	public void setX(float x) {
 		this.x = x;
 	}
@@ -111,6 +119,9 @@ public abstract class Gate {
 	}
 	public boolean isDeleting() {
 		return deleting;
+	}
+	public boolean isDeleted() {
+		return deleted;
 	}
 	public boolean isWiring() {
 		return wiring;
