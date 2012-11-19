@@ -102,4 +102,12 @@ public class Input extends Gate {
 		return str;
 	}
 	
+	public void drawWires(Canvas c) {
+		return;
+	}
+	
+	protected void flipInPath(){
+		inPath = !inPath;
+	}
+	
 }

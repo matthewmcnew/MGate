@@ -130,7 +130,6 @@ public class UnaryGate extends Gate {
 	public void draw(Canvas c,ArrayList<Bitmap> circles) {
 		super.draw(c,circles);
 		
-		
 		if(!selected) {
 			Gateway.p("Not selected");
 			Gateway.p(input);
@@ -143,7 +142,6 @@ public class UnaryGate extends Gate {
 				}
 			} else {
 				c.drawBitmap(circles.get(0), x-25, y + bitmap.getHeight()/2 - 12, null);
-				c.drawLine(x-25, y + bitmap.getHeight()/2, input.getOutputX(), input.getOutputY(), paint);
 			}
 			
 			if(getOutput() == 0) {
@@ -155,45 +153,34 @@ public class UnaryGate extends Gate {
 		} else {
 			if (input != null) {
 				c.drawBitmap(circles.get(0), x-25, y + bitmap.getHeight()/2 - 12, null);
+>>>>>>>>>>>>>>>>>>>> File 1
 				c.drawLine(x-25, y + bitmap.getHeight()/2, input.getOutputX(), input.getOutputY(), paint);
+>>>>>>>>>>>>>>>>>>>> File 2
+				c.drawLine(x-25, y + bitmap.getHeight()/2, input.getOutputX(), input.getOutputY(), paint);
+>>>>>>>>>>>>>>>>>>>> File 3
+<<<<<<<<<<<<<<<<<<<<
 			}
 		}
 		
 	}
-
-	public String getHelp() {
-	String str = "";
-                switch(type) {
-                case NOT:
-                        str += "This is a NOT gate.\n";
-			str += "NOT gates output a value opposite of the input. ";
-			str += "The opposite of 1 is considered 0, and vice cersa. ";
-			str += "The NOT truth table is given below: \n";
-			str += "b is NOT a\n\n;"
-			str += "a|b\n";
-			str += "---\n";
-			str += "0|1\n";
-			str += "1|0\n";
-                        break;
-                case BUFF:
-                        str += "This is a BUFFER gate.\n";
-                        str += "BUFFER gates output the value of the input. ";
-                        str += "The BUFFER truth table is given below: \n";
-                        str += "b is BUFFER of a\n\n;"
-                        str += "a|b\n";
-                        str += "---\n";
-                        str += "0|0\n";
-                        str += "1|1\n";
-                        break;
-                case ONE:
-                        str += "This is a ONE gate.\n";
-                        str += "ONE always gates output one. ";
-                        break;
-                case ZERO:
-                        str += "This is a ZERO gate.\n";
-                        str += "ZERO always gates output zero. ";
-                        break;
-                }
-		return str;
+	
+	public void drawWires(Canvas c) {
+		if(!selected) {
+			if(!(input == null || input.isDeleted())) {
+				c.drawLine(x-25, y + bitmap.getHeight()/2, input.getOutputX(), input.getOutputY(), paint);
+			}
+		} else {
+			if (input != null) {
+				c.drawLine(x-25, y + bitmap.getHeight()/2, input.getOutputX(), input.getOutputY(), paint);
+				
+			}
+		}
+	}
+	
+	protected void flipInPath(){
+		inPath = !inPath;
+		if(input != null) {
+			input.flipInPath();
+		}
 	}
 }

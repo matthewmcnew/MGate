@@ -16,7 +16,8 @@ public abstract class Gate {
 	public abstract boolean inPath(Gate g);
 	public abstract Gate clone();
 	public abstract ArrayList<Gate> getInputs();
-	public abstract String getHelp();
+	public abstract void drawWires(Canvas c);
+	protected abstract void flipInPath();
 	
 	protected Bitmap bitmap;
 	protected float x;
@@ -25,6 +26,7 @@ public abstract class Gate {
 	protected boolean deleting = false;
 	protected boolean wiring = false;
 	protected boolean deleted = false;
+	protected boolean inPath = false;
 		
 	protected static Paint paint = new Paint();
 	
@@ -91,7 +93,7 @@ public abstract class Gate {
 	}
 	
 	public boolean inGate(MotionEvent event){
-		return((event.getX() > x && event.getX() < (x + bitmap.getWidth())) && (event.getY() > y && event.getY() < (y + bitmap.getHeight())));
+		return((event.getX() > x && event.getX() < (x + bitmap.getWidth() * (3.0/4.0))) && (event.getY() > y && event.getY() < (y + bitmap.getHeight())));
 				
 	}
 	
@@ -127,7 +129,10 @@ public abstract class Gate {
 	public boolean isWiring() {
 		return wiring;
 	}
-	public void setWiring(boolean wiring) {
-		this.wiring = wiring;
+	public void flipWiring() {
+		flipInPath();
+		this.wiring = !wiring;
 	}
+	
+	
 }

@@ -50,7 +50,6 @@ public class Gateway extends Activity {
 		public PlayAreaView(Context context) {       	
             super(context);
             loadImages();
-            reset();
         }
 		
 		protected void onDraw(Canvas canvas) {
@@ -59,6 +58,11 @@ public class Gateway extends Activity {
 			if(modifyingOutputGate != null){
 				paint.setColor(Color.GREEN);
 				canvas.drawLine( beginX, beginY, wireX, wireY, paint);
+			}
+			
+			//DrawWires
+		    for(Gate g : gates){
+		    	g.drawWires(canvas);
 			}
 			
 		    
@@ -133,13 +137,14 @@ public class Gateway extends Activity {
 						count++;
 					}
 					
+					// touch an input or output
 					for(Gate g : gates){
 						if(g.inputFlip(event)){
 							this.invalidate();
 							break;
 						}
 						if(g.outputTouched(event)){
-							g.setWiring(true); 
+							g.flipWiring();
 							modifyingOutputGate = g;
 
 
@@ -154,7 +159,6 @@ public class Gateway extends Activity {
 					}	
 					
 					// touch an exisiting one?
-					
 					for(Gate g : gates){
 						if(g.inGate(event)){
 							select(g);
@@ -174,8 +178,8 @@ public class Gateway extends Activity {
 		        			selected.setDeleting(false);
 		        		}
 		        		
-		        		selected.setX(event.getX());
-		        		selected.setY(event.getY()); 
+		        		selected.setX(event.getX() - selected.bitmap.getWidth()/2);
+		        		selected.setY(event.getY() - selected.bitmap.getHeight()/2); 
 		        		
 		        		if(modifyingOutputGate != null) {
 		        			beginX = modifyingOutputGate.getOutputX();
@@ -198,7 +202,7 @@ public class Gateway extends Activity {
 	        					break;
 	        				}
 	        			}
-    					modifyingOutputGate.setWiring(false);
+    					modifyingOutputGate.flipWiring();
     					modifyingOutputGate = null;
     					invalidate();
 	        		}
@@ -215,19 +219,7 @@ public class Gateway extends Activity {
 		        	}
 	        		
 		        	this.invalidate();
-		        	
-//		            // finger leaves the screen
-//		        	if(currentOrange != -1)
-//		        	{
-//		        		if(inBasket(event)){
-//		        			oranges[currentOrange].orange = orangePlaced;
-//		        			oranges[currentOrange].freeze();
-//		        		}else {
-//		        			oranges[currentOrange].orange = orange;
-//		        		}
-//		        		this.invalidate();
-//		        		currentOrange = -1;
-//		        	}
+
 		            break;
 		    }
 
@@ -236,33 +228,9 @@ public class Gateway extends Activity {
 		}
 		
         
-        
-//        private boolean inBasket(MotionEvent event) {
-//        	if(event.getX() > (getMeasuredWidth() - basket.getWidth())) {
-//        		if(event.getY() > (getMeasuredHeight() - (3*basket.getHeight()/4))) {
-//        			return true;
-//        		}
-//        		
-//        	}
-//			return false;
-//		}
+   
 
-		private void reset() {
-			and.getWidth();
 
-//            oranges = new Orange[3];
-//            
-//            
-//            DisplayMetrics metrics = new DisplayMetrics();
-//            getWindowManager().getDefaultDisplay().getMetrics(metrics);
-//       
-//            
-//            
-//            oranges[0] = new Orange(metrics.widthPixels/3,metrics.widthPixels/8,orange);
-//            oranges[1] = new Orange(metrics.widthPixels/2,metrics.widthPixels/5,orange);
-//            oranges[2] = new Orange(2*metrics.widthPixels/3,metrics.widthPixels/8,orange);
-//            
-        }
 		
 		private void loadImages() {
 			metrics = new DisplayMetrics();
@@ -310,6 +278,8 @@ public class Gateway extends Activity {
                     R.drawable.outputnode0));
             circles.add(BitmapFactory.decodeResource(getResources(),
                     R.drawable.outputnode1));
+            circles.add(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.cantwire1));
             
             
 		}
