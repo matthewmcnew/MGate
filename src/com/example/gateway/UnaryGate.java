@@ -160,4 +160,39 @@ public class UnaryGate extends Gate {
 		}
 		
 	}
+
+	public String getHelp() {
+	String str = "";
+                switch(type) {
+                case NOT:
+                        str += "This is a NOT gate.\n";
+			str += "NOT gates output a value opposite of the input. ";
+			str += "The opposite of 1 is considered 0, and vice cersa. ";
+			str += "The NOT truth table is given below: \n";
+			str += "b is NOT a\n\n;"
+			str += "a|b\n";
+			str += "---\n";
+			str += "0|1\n";
+			str += "1|0\n";
+                        break;
+                case BUFF:
+                        str += "This is a BUFFER gate.\n";
+                        str += "BUFFER gates output the value of the input. ";
+                        str += "The BUFFER truth table is given below: \n";
+                        str += "b is BUFFER of a\n\n;"
+                        str += "a|b\n";
+                        str += "---\n";
+                        str += "0|0\n";
+                        str += "1|1\n";
+                        break;
+                case ONE:
+                        str += "This is a ONE gate.\n";
+                        str += "ONE always gates output one. ";
+                        break;
+                case ZERO:
+                        str += "This is a ZERO gate.\n";
+                        str += "ZERO always gates output zero. ";
+                        break;
+                }
+	}
 }
