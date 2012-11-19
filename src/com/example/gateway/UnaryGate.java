@@ -194,5 +194,6 @@ public class UnaryGate extends Gate {
                         str += "ZERO always gates output zero. ";
                         break;
                 }
+		return str;
 	}
 }
