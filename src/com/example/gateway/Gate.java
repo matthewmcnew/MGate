@@ -16,6 +16,7 @@ public abstract class Gate {
 	public abstract boolean inPath(Gate g);
 	public abstract Gate clone();
 	public abstract ArrayList<Gate> getInputs();
+	public abstract String getHelp();
 	
 	protected Bitmap bitmap;
 	protected float x;

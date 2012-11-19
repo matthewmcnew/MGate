@@ -93,5 +93,13 @@ public class Input extends Gate {
 		}
 		
 	}
+
+	public String getHelp() {
+		String str = "";
+		str += "This is an INPUT gate.\n";
+		str += "INPUT gates will only output the value they recieve as input. ";
+		str += "Touch the blue input circle to change the value.";
+		return str;
+	}
 	
 }
