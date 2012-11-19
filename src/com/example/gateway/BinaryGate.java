@@ -157,18 +157,51 @@ public class BinaryGate extends Gate{
 	public boolean inputFlip(MotionEvent event) {
 		if(event.getX() > (x-35) && event.getX() < (x+22) ){
 			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()/2) ){
-				flipLiteral(0);
+				if(input1 == null)
+					flipLiteral(0);				
 				return true;
 			}
 		}
 		if(event.getX() > (x-35) && event.getX() < (x+22) ){
 			if(event.getY() > (y+bitmap.getHeight()/2) && event.getY() < (y+bitmap.getHeight()+5) ){
-				flipLiteral(1);
+				if(input1 == null)
+					flipLiteral(1);
 				return true;
 			}
 		}
 		return false;
 	}
+	
+	//This needs to be dryed up some day. 
+	public Gate disconnectWire(MotionEvent event) {
+		if(event.getX() > (x-35) && event.getX() < (x+22) ){
+			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()/2) ){
+				if(input1 != null) {
+					return input1;
+				}
+									
+			}
+		}
+		if(event.getX() > (x-35) && event.getX() < (x+22) ){
+			if(event.getY() > (y+bitmap.getHeight()/2) && event.getY() < (y+bitmap.getHeight()+5) ){
+				if(input2 != null) {
+					return input2;	
+				}
+			}
+		}
+		return null;
+	}
+	
+	public void clearInput(Gate input) {
+		if(input1 == input)
+			input1 = null;
+		else if (input2 == input) {
+			input2 = null;
+		}
+	}
+	
+	
+	
 	
 	public boolean snapWire(MotionEvent event, Gate selected) {
 		if(event.getX() > (x-35) && event.getX() < (x+22) ){
@@ -241,22 +274,12 @@ public class BinaryGate extends Gate{
 	}
 	
 	public void drawWires(Canvas c) {
-		if(!selected) {
-			if(!(input1 == null || input1.isDeleted())) {
-				c.drawLine(x-25, y + 19, input1.getOutputX(), input1.getOutputY(), paint);
-			}
+		if(input1 != null && !input1.isDeleted()) {
+			c.drawLine(x-25, y + 19, input1.getOutputX(), input1.getOutputY(), paint);
+		}
 
-			if(!(input2 == null || input2.isDeleted())) {
-				c.drawLine(x-25, y + 59, input2.getOutputX(), input2.getOutputY(), paint);
-			}
-		} else {
-			if(input1 != null) {
-				c.drawLine(x-25, y + 19, input1.getOutputX(), input1.getOutputY(), paint);
-			}
-			
-			if(input2 != null) {
-				c.drawLine(x-25, y + 59, input2.getOutputX(), input2.getOutputY(), paint);
-			}
+		if(input2 != null && !input2.isDeleted()) {
+			c.drawLine(x-25, y + 52, input2.getOutputX(), input2.getOutputY(), paint);
 		}
 	}
 	
@@ -269,6 +292,90 @@ public class BinaryGate extends Gate{
 		if(input2 != null) {
 			input2.flipInPath();
 		}	
+	}
+
+	public String getHelp() {
+		String str = "";
+		switch(type) {
+		case AND:
+			str += "This is an AND gate.\n";
+			str += "AND gates outputs one if both inputs are one. It outputs zero otherwise.\n";
+			str += "The AND truth table is given below:\n";
+			str += "c = a AND b\n\n";
+			str += "a|b|c\n";
+			str += "-----\n";
+			str += "0|0|0\n";
+			str += "0|1|0\n";
+			str += "1|0|0\n";
+			str += "1|1|1\n";
+			break;
+		case OR:
+			str += "This is an OR gate.\n";
+			str += "OR gates output one if either input is one. It outputs zero otherwise.\n";
+			str += "The OR truth table is given below:\n";
+			str += "c = a OR b\n\n";
+			str += "a|b|c\n";
+			str += "-----\n";
+			str += "0|0|0\n";
+			str += "0|1|1\n";
+			str += "1|0|1\n";
+			str += "1|1|1\n";
+			break;
+
+		case NAND:
+			str += "This is a NAND gate.\n";
+			str += "NAND gates output the logical opposite of the AND gate. a NAND b = NOT(a AND b).\n";
+			str += "The NAND truth table is given below:\n";
+			str += "c = a NAND b\n\n";
+			str += "a|b|c\n";
+			str += "-----\n";
+			str += "0|0|1\n";
+			str += "0|1|1\n";
+			str += "1|0|1\n";
+			str += "1|1|0\n";
+			break;
+		case XOR:
+			str += "This is an XOR gate.\n";
+			str += "XOR gates output one if one input is the opposite of the other. It outputs zero otherwise.\n";
+			str += "The XOR truth table is given below:\n";
+			str += "c = a XOR b\n\n";
+			str += "a|b|c\n";
+			str += "-----\n";
+			str += "0|0|0\n";
+			str += "0|1|1\n";
+			str += "1|0|1\n";
+			str += "1|1|0\n";
+			break;
+		case NOR:
+			str += "This is a NOR gate.\n";
+			str += "NOR gates outputs the logical opposite of the OR gate. a NOR b = NOT(a OR b).\n";
+			str += "The NOR truth table is given below:\n";
+			str += "c = a NOR b\n\n";
+			str += "a|b|c\n";
+			str += "-----\n";
+			str += "0|0|1\n";
+			str += "0|1|0\n";
+			str += "1|0|0\n";
+			str += "1|1|0\n";
+			break;
+		case EQUIV:
+			str += "This is an EQUIV (equivilency) gate.\n";
+			str += "EQUIV gates output one if the inputs are the same. It outputs zero otherwise.\n";
+			str += "The EQUIV truth table is given below:\n";
+			str += "c = a EQUIV b\n\n";
+			str += "a|b|c\n";
+			str += "-----\n";
+			str += "0|0|1\n";
+			str += "0|1|0\n";
+			str += "1|0|0\n";
+			str += "1|1|1\n";
+			break;
+		case ONE:
+			break;
+		case ZERO:
+			break;
+		}
+		return str;
 	}
 	
 	

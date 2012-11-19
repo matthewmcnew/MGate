@@ -17,7 +17,9 @@ public abstract class Gate {
 	public abstract Gate clone();
 	public abstract ArrayList<Gate> getInputs();
 	public abstract void drawWires(Canvas c);
+	public abstract String getHelp();
 	protected abstract void flipInPath();
+	public abstract Gate disconnectWire(MotionEvent event);
 	
 	protected Bitmap bitmap;
 	protected float x;
@@ -134,5 +136,8 @@ public abstract class Gate {
 		this.wiring = !wiring;
 	}
 	
+	public void clearInput(Gate input){
+		return;
+	}
 	
 }

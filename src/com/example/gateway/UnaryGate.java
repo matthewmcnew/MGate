@@ -107,11 +107,33 @@ public class UnaryGate extends Gate {
 	public boolean inputFlip(MotionEvent event) {
 		if(event.getX() > (x-35) && event.getX() < (x+22) ){
 			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()) ){
-				flipLiteral();
+				System.out.print("insideFlip -----------------------------------------------------------------------------------\n");
+				if(input == null)
+					flipLiteral();
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	
+	public Gate disconnectWire(MotionEvent event) {
+		
+		if(event.getX() > (x-35) && event.getX() < (x+22) ){
+			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()) ){
+				System.out.print("inside -----------------------------------------------------------------------------------\n");
+				if(input != null) {
+					return input;
+				}
+					
+			}
+		}
+
+		return null;
+	}
+	
+	public void clearInput(Gate input) {
+		input = null;
 	}
 	
 	public boolean snapWire(MotionEvent event, Gate selected) {
@@ -131,17 +153,19 @@ public class UnaryGate extends Gate {
 		super.draw(c,circles);
 		
 		if(!selected) {
-			Gateway.p("Not selected");
-			Gateway.p(input);
-			if(input == null || input.isDeleted()) {
-				input = null;
-				if(literal == 0) {
-					c.drawBitmap(circles.get(1), x-25, y + bitmap.getHeight()/2 - 12, null);
-				}else if(literal == 1) {
-					c.drawBitmap(circles.get(2), x-25, y + bitmap.getHeight()/2 - 12, null);
-				}
-			} else {
-				c.drawBitmap(circles.get(0), x-25, y + bitmap.getHeight()/2 - 12, null);
+			if(inPath) {
+				c.drawBitmap(circles.get(5), x-25, y + bitmap.getHeight()/2 - 12, null);
+			}else {
+				if(input == null || input.isDeleted()) {
+					input = null;
+					if(literal == 0) {
+						c.drawBitmap(circles.get(1), x-25, y + bitmap.getHeight()/2 - 12, null);
+					}else if(literal == 1) {
+						c.drawBitmap(circles.get(2), x-25, y + bitmap.getHeight()/2 - 12, null);
+					}
+				} else {
+					c.drawBitmap(circles.get(0), x-25, y + bitmap.getHeight()/2 - 12, null);
+				}	
 			}
 			
 			if(getOutput() == 0) {
@@ -177,4 +201,41 @@ public class UnaryGate extends Gate {
 			input.flipInPath();
 		}
 	}
+	
+	public String getHelp() {
+		String str = "";
+		switch(type) {
+		case NOT:
+			str += "This is a NOT gate.\n";
+			str += "NOT gates output a value opposite of the input. ";
+			str += "The opposite of 1 is considered 0, and vice cersa. ";
+			str += "The NOT truth table is given below: \n";
+			str += "b is NOT a\n\n;";
+			str += "a|b\n";
+			str += "---\n";
+			str += "0|1\n";
+			str += "1|0\n";
+			break;
+		case BUFF:
+			str += "This is a BUFFER gate.\n";
+			str += "BUFFER gates output the value of the input. ";
+			str += "The BUFFER truth table is given below: \n";
+			str += "b is BUFFER of a\n\n;";
+			str += "a|b\n";
+			str += "---\n";
+			str += "0|0\n";
+			str += "1|1\n";
+			break;
+		case ONE:
+			str += "This is a ONE gate.\n";
+			str += "ONE always gates output one. ";
+			break;
+		case ZERO:
+			str += "This is a ZERO gate.\n";
+			str += "ZERO always gates output zero. ";
+			break;
+		}
+		return str;
+	}
+
 }

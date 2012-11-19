@@ -17,8 +17,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
-public class Gateway extends Activity {
-
+public class Gateway extends Activity  {
+	
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -139,10 +139,30 @@ public class Gateway extends Activity {
 					
 					// touch an input or output
 					for(Gate g : gates){
-						if(g.inputFlip(event)){
+						//This needs to be cleaned up someday.  
+						Gate testingGate = g.disconnectWire(event);
+						if(testingGate != null) {
+							 modifyingOutputGate = testingGate;
+							 modifyingOutputGate.flipWiring();
+							 g.clearInput(modifyingOutputGate);
+							 
+							 beginX = modifyingOutputGate.getOutputX();
+							 beginY = modifyingOutputGate.getOutputY();
+
+							 wireX = event.getX();
+							 wireY = event.getY();
+							 
+							 this.invalidate();
+							 return true;
+							 
+						}
+						
+						else if(g.inputFlip(event)){
+							
 							this.invalidate();
 							break;
-						}
+						} 
+						
 						if(g.outputTouched(event)){
 							g.flipWiring();
 							modifyingOutputGate = g;
@@ -227,10 +247,6 @@ public class Gateway extends Activity {
 			return true;
 		}
 		
-        
-   
-
-
 		
 		private void loadImages() {
 			metrics = new DisplayMetrics();
@@ -295,6 +311,6 @@ public class Gateway extends Activity {
     }
     
     public static void p(Object o) {
-    	System.out.println(o);
+    	//System.out.println(o);
     }
 }

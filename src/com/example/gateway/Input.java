@@ -61,6 +61,10 @@ public class Input extends Gate {
 		return false;
 	}
 	
+	public Gate disconnectWire(MotionEvent event) {
+		return null;
+	}
+	
 	public boolean snapWire(MotionEvent event, Gate selected) {
 		return false;
 	}
@@ -76,18 +80,21 @@ public class Input extends Gate {
 	public void draw(Canvas c,ArrayList<Bitmap> circles) {
 		super.draw(c,circles);
 		if(!selected) {
+			if(inPath) {
+				c.drawBitmap(circles.get(5), x-25, y + bitmap.getHeight()/2 - 12, null);
+			} else {
+				if(type == Type.ZERO) {
+					c.drawBitmap(circles.get(1), x-25, y + bitmap.getHeight()/2 - 12, null);
+				}else if(type == Type.ONE) {
+					c.drawBitmap(circles.get(2), x-25, y + bitmap.getHeight()/2 - 12, null);
+				}
 
-			if(type == Type.ZERO) {
-				c.drawBitmap(circles.get(1), x-25, y + bitmap.getHeight()/2 - 12, null);
-			}else if(type == Type.ONE) {
-				c.drawBitmap(circles.get(2), x-25, y + bitmap.getHeight()/2 - 12, null);
-			}
-
-			
-			if(getOutput() == 0) {
-				c.drawBitmap(circles.get(3), x+bitmap.getWidth()-19, y + bitmap.getHeight()/2 - 12, null);
-			}else if(getOutput() == 1) {
-				c.drawBitmap(circles.get(4), x+bitmap.getWidth()-19, y + bitmap.getHeight()/2 - 12, null);
+				
+				if(getOutput() == 0) {
+					c.drawBitmap(circles.get(3), x+bitmap.getWidth()-19, y + bitmap.getHeight()/2 - 12, null);
+				}else if(getOutput() == 1) {
+					c.drawBitmap(circles.get(4), x+bitmap.getWidth()-19, y + bitmap.getHeight()/2 - 12, null);
+				}
 			}
 			
 		}
