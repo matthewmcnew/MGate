@@ -164,7 +164,7 @@ public class BinaryGate extends Gate{
 		}
 		if(event.getX() > (x-35) && event.getX() < (x+22) ){
 			if(event.getY() > (y+bitmap.getHeight()/2) && event.getY() < (y+bitmap.getHeight()+5) ){
-				if(input1 == null)
+				if(input2 == null)
 					flipLiteral(1);
 				return true;
 			}
