@@ -82,8 +82,9 @@ public class BinaryGate extends Gate{
 		input1 = g1;
 		input2 = g2;
 	}
-	public void setInput(Gate g1){
-		input1 = g1;
+	
+	public void setInput(Gate g){
+		input1 = g;
 		input2 = null;
 	}
 
@@ -382,12 +383,7 @@ public class BinaryGate extends Gate{
 		return str;
 	}
 
-<<<<<<< HEAD
-	@Override
-	public ArrayList<Gate> getBaseInputs() {
-		// TODO Auto-generated method stub
-		return null;
-=======
+
 	public ArrayList<Gate> getBaseInputs() {
 		ArrayList<Gate> ins = new ArrayList<Gate>();
 		if(input1!=null) {
@@ -399,7 +395,7 @@ public class BinaryGate extends Gate{
 		}
 		
 		return ins;
->>>>>>> woky worky done by max and mark splash screen
+
 	}
 	
 	

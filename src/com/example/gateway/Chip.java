@@ -122,10 +122,6 @@ public class Chip extends Gate{
 
 	}
 
-	@Override
-	protected void setInPath(boolean state) {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 }
