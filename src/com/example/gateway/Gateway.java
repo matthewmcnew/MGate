@@ -58,6 +58,14 @@ public class Gateway extends Activity  {
             newGate = new Input(Input.Type.ZERO, BitmapFactory.decodeResource(getResources(),
                     R.drawable.inputgate), 200, 300);
             gates.add(newGate);
+            newGate = new BinaryGate(BinaryGate.Type.AND, BitmapFactory.decodeResource(getResources(),
+                    R.drawable.and), 500, 200);
+            gates.add(newGate);
+            newGate = new BinaryGate(BinaryGate.Type.AND, BitmapFactory.decodeResource(getResources(),
+                    R.drawable.and), 500, 400);
+            gates.add(newGate);
+            gates.get(1).setInput(gates.get(0));
+            gates.get(2).setInput(gates.get(0));
         }
 		
 		protected void onDraw(Canvas canvas) {

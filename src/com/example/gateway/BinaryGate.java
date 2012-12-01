@@ -82,6 +82,10 @@ public class BinaryGate extends Gate{
 		input1 = g1;
 		input2 = g2;
 	}
+	public void setInput(Gate g1){
+		input1 = g1;
+		input2 = null;
+	}
 
 	public int getOutput() {
 		int in1;
