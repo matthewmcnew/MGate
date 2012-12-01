@@ -89,7 +89,7 @@ public class Gateway extends Activity  {
 		}
 		
 		private void drawMenu(Canvas canvas) {		 
-			paint.setColor(Color.BLACK);
+			paint.setColor(0xff222222); //grey
 			//canvas.drawRect(left, top, right, bottom, paint)
 			canvas.drawRect(0, 0, metrics.widthPixels+10, menu.get(1).getHeight(), paint);
 			Paint p = new Paint(Paint.FILTER_BITMAP_FLAG);
