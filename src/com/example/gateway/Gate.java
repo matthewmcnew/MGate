@@ -18,7 +18,7 @@ public abstract class Gate {
 	public abstract ArrayList<Gate> getInputs();
 	public abstract void drawWires(Canvas c);
 	public abstract String getHelp();
-	protected abstract void flipInPath();
+	protected abstract void setInPath(boolean state);
 	public abstract Gate disconnectWire(MotionEvent event);
 	public boolean isInput() { return false; }
 	public abstract ArrayList<Gate> getBaseInputs();
@@ -134,8 +134,8 @@ public abstract class Gate {
 		return wiring;
 	}
 	public void flipWiring() {
-		flipInPath();
 		this.wiring = !wiring;
+		setInPath(this.wiring);
 	}
 	
 	public void clearInput(Gate input){

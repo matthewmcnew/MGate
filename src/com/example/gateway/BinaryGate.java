@@ -283,14 +283,14 @@ public class BinaryGate extends Gate{
 		}
 	}
 	
-	protected void flipInPath(){
-		inPath = !inPath;
+	protected void setInPath(boolean state){
+		inPath = state;
 		if(input1 != null) {
-			input1.flipInPath();
+			input1.setInPath(state);
 		}
 		
 		if(input2 != null) {
-			input2.flipInPath();
+			input2.setInPath(state);
 		}	
 	}
 

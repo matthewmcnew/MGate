@@ -195,10 +195,10 @@ public class UnaryGate extends Gate {
 		}
 	}
 	
-	protected void flipInPath(){
-		inPath = !inPath;
+	protected void setInPath(boolean state){
+		inPath = state;
 		if(input != null) {
-			input.flipInPath();
+			input.setInPath(state);
 		}
 	}
 	

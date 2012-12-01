@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -73,16 +74,25 @@ public class Gateway extends Activity  {
 		}
 		
 		private void drawMenu(Canvas canvas) {		 
+			paint.setColor(Color.BLACK);
+			//canvas.drawRect(left, top, right, bottom, paint)
+			canvas.drawRect(0, 0, metrics.widthPixels+10, menu.get(1).getHeight(), paint);
+			
 			if((selected == null)) {
+				
+				Paint p = new Paint(Paint.FILTER_BITMAP_FLAG);
+				p.setFilterBitmap(true);
+				p.setColorFilter(new LightingColorFilter(65280,0xFFFFFF));    //GREEN
+				
 				int distance = 0;
 				for(Bitmap b : menu){
-					canvas.drawBitmap(b, distance, 0, null);
+					canvas.drawBitmap(b, distance, 0, p);
 					distance = distance + b.getWidth();
-				}				
+				}	
+				
+				
 			}else{
 				canvas.drawBitmap(remove, ((metrics.widthPixels)/2) - remove.getWidth()/2  , 0, null);
-				
-				
 			}
 
 		}

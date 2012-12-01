@@ -117,8 +117,8 @@ public class Input extends Gate {
 		return;
 	}
 	
-	protected void flipInPath(){
-		inPath = !inPath;
+	protected void setInPath(boolean state){
+		inPath = state;
 	}
 
 	@Override
