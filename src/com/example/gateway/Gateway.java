@@ -46,6 +46,8 @@ public class Gateway extends Activity  {
         float wireX,wireY;
         float beginX,beginY;
         
+        int menuItem = -2;
+        
         private Paint paint = new Paint();
         
 		public PlayAreaView(Context context) {       	
@@ -77,17 +79,24 @@ public class Gateway extends Activity  {
 			paint.setColor(Color.BLACK);
 			//canvas.drawRect(left, top, right, bottom, paint)
 			canvas.drawRect(0, 0, metrics.widthPixels+10, menu.get(1).getHeight(), paint);
+			Paint p = new Paint(Paint.FILTER_BITMAP_FLAG);
+			p.setFilterBitmap(true);
+			p.setColorFilter(new LightingColorFilter(65280,0xFFFFFF));    //white
 			
-			if((selected == null)) {
-				
-				Paint p = new Paint(Paint.FILTER_BITMAP_FLAG);
-				p.setFilterBitmap(true);
-				p.setColorFilter(new LightingColorFilter(65280,0xFFFFFF));    //GREEN
-				
+			if((selected == null)) {	
 				int distance = 0;
+				int count = -1;
 				for(Bitmap b : menu){
-					canvas.drawBitmap(b, distance, 0, p);
+					if(menuItem == count){
+						p.setColorFilter(new LightingColorFilter(65280,65280)); // green
+						canvas.drawBitmap(b, distance, 0, p);
+						p.setColorFilter(new LightingColorFilter(65280,0xFFFFFF));  
+					}else {
+						canvas.drawBitmap(b, distance, 0, p);
+					}
+					
 					distance = distance + b.getWidth();
+					count++;
 				}	
 				
 				
@@ -113,34 +122,35 @@ public class Gateway extends Activity  {
 		        	//menu touch?
 		        	int distance = 0;
 		        	int count = -1;
-		        	Gate newGate = null;
+		        	//Gate newGate = null;
 					for(Bitmap bitmap : menu){
 						if(event.getX() < ( bitmap.getWidth() + distance) && event.getX() > distance && event.getY() < bitmap.getHeight() ){
-							switch(count) {
-							case -1:
-								newGate = new Input(Input.Type.ZERO,bitmap,event.getX(),event.getY());
-								break;
-							case 0:
-								newGate = new BinaryGate(BinaryGate.Type.AND,bitmap,event.getX(),event.getY());
-								break;
-							case 1:
-								newGate = new BinaryGate(BinaryGate.Type.NAND,bitmap,event.getX(),event.getY());
-								break;
-							case 2:
-								newGate = new BinaryGate(BinaryGate.Type.NOR,bitmap,event.getX(),event.getY());
-								break;
-							case 3:
-								newGate = new UnaryGate(UnaryGate.Type.NOT,bitmap,event.getX(),event.getY());
-								break;
-							case 4:
-								newGate = new BinaryGate(BinaryGate.Type.OR,bitmap,event.getX(),event.getY());
-								break;
-							case 5:
-								newGate = new BinaryGate(BinaryGate.Type.XOR,bitmap,event.getX(),event.getY());
-								break;
-							}
-							gates.add(newGate);
-							select(newGate);
+//							switch(count) {
+//							case -1:
+//								newGate = new Input(Input.Type.ZERO,bitmap,event.getX(),event.getY());
+//								break;
+//							case 0:
+//								newGate = new BinaryGate(BinaryGate.Type.AND,bitmap,event.getX(),event.getY());
+//								break;
+//							case 1:
+//								newGate = new BinaryGate(BinaryGate.Type.NAND,bitmap,event.getX(),event.getY());
+//								break;
+//							case 2:
+//								newGate = new BinaryGate(BinaryGate.Type.NOR,bitmap,event.getX(),event.getY());
+//								break;
+//							case 3:
+//								newGate = new UnaryGate(UnaryGate.Type.NOT,bitmap,event.getX(),event.getY());
+//								break;
+//							case 4:
+//								newGate = new BinaryGate(BinaryGate.Type.OR,bitmap,event.getX(),event.getY());
+//								break;
+//							case 5:
+//								newGate = new BinaryGate(BinaryGate.Type.XOR,bitmap,event.getX(),event.getY());
+//								break;
+//							}
+//							gates.add(newGate);
+//							select(newGate);
+							menuItem = count;
 							break;
 						}
 						distance = distance + bitmap.getWidth();
@@ -200,6 +210,40 @@ public class Gateway extends Activity  {
 		            break;
 
 		        case MotionEvent.ACTION_MOVE:
+		        	
+		        	if(menuItem != -2 && (event.getY() > (menu.get(menuItem+1).getHeight()+menu.get(menuItem+1).getHeight()/2))){
+		        		Gate newGate = null;
+		        		switch(menuItem) {
+						case -1:
+							newGate = new Input(Input.Type.ZERO,menu.get(menuItem+1),event.getX(),event.getY());
+							break;
+						case 0:
+							newGate = new BinaryGate(BinaryGate.Type.AND,menu.get(menuItem+1),event.getX(),event.getY());
+							break;
+						case 1:
+							newGate = new BinaryGate(BinaryGate.Type.NAND,menu.get(menuItem+1),event.getX(),event.getY());
+							break;
+						case 2:
+							newGate = new BinaryGate(BinaryGate.Type.NOR,menu.get(menuItem+1),event.getX(),event.getY());
+							break;
+						case 3:
+							newGate = new UnaryGate(UnaryGate.Type.NOT,menu.get(menuItem+1),event.getX(),event.getY());
+							break;
+						case 4:
+							newGate = new BinaryGate(BinaryGate.Type.OR,menu.get(menuItem+1),event.getX(),event.getY());
+							break;
+						case 5:
+							newGate = new BinaryGate(BinaryGate.Type.XOR,menu.get(menuItem+1),event.getX(),event.getY());
+							break;
+						}
+						gates.add(newGate);
+						select(newGate);
+		        		
+		        		menuItem = -2;
+		        		
+		        		
+		        	}
+		        	
 		        	if(selected != null)
 		        	{
 		        		if(event.getY() < menu.get(0).getHeight()){
@@ -225,6 +269,10 @@ public class Gateway extends Activity  {
 
 		        case MotionEvent.ACTION_UP:
 		        	
+		        	if(menuItem != -2){
+		        		menuItem = -2;
+		        	}
+		        	
 	        		if(modifyingOutputGate != null) {
 	        			for(Gate g : gates) {
 	        				p("Testing gate: "+g);
@@ -236,6 +284,8 @@ public class Gateway extends Activity  {
     					modifyingOutputGate = null;
     					invalidate();
 	        		}
+	        		
+	    
 	        		
 		        	if(selected != null){
 		        		if(selected.isDeleting()){

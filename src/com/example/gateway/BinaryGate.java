@@ -377,6 +377,12 @@ public class BinaryGate extends Gate{
 		}
 		return str;
 	}
+
+	@Override
+	public ArrayList<Gate> getBaseInputs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 }

@@ -103,4 +103,16 @@ public class Chip extends Gate{
 		}
 	}
 
+	@Override
+	protected void setInPath(boolean state) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ArrayList<Gate> getBaseInputs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
