@@ -24,6 +24,7 @@ public class Gateway extends Activity  {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
         setContentView(R.layout.activity_gateway);
         FrameLayout frame = (FrameLayout) findViewById(R.id.graphics_holder);
         PlayAreaView image = new PlayAreaView(this);
@@ -53,6 +54,10 @@ public class Gateway extends Activity  {
 		public PlayAreaView(Context context) {       	
             super(context);
             loadImages();
+            Gate newGate = null;
+            newGate = new Input(Input.Type.ZERO, BitmapFactory.decodeResource(getResources(),
+                    R.drawable.inputgate), 200, 300);
+            gates.add(newGate);
         }
 		
 		protected void onDraw(Canvas canvas) {

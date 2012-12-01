@@ -240,17 +240,12 @@ public class UnaryGate extends Gate {
 
 	@Override
 	public ArrayList<Gate> getBaseInputs() {
-		
+		ArrayList<Gate> ins = new ArrayList<Gate>();
+
 		if(input!=null) {
-			if(input.isInput()) {
-				return getInputs();
-			} else {
-				return input.getBaseInputs();
-			}
-		} else {
-			ArrayList<Gate> ins = new ArrayList<Gate>();
-			return ins;
+			ins.addAll(input.getBaseInputs());
 		}
+		return ins;
 	}
 
 }

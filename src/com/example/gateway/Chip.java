@@ -99,20 +99,27 @@ public class Chip extends Gate{
 		if(newIns.size() == 0) {
 			
 		} else {
-			
+			for(Gate in : newIns) {
+				if(in.isInput()) {
+					inputs.add(in);
+				}
+			}
 		}
 	}
 
+
 	@Override
 	protected void setInPath(boolean state) {
-		// TODO Auto-generated method stub
+		inPath = state;
 		
 	}
 
-	@Override
+
+
 	public ArrayList<Gate> getBaseInputs() {
-		// TODO Auto-generated method stub
-		return null;
+		//WRONG
+		return getInputs();
+
 	}
 
 }

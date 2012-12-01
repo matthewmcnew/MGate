@@ -378,10 +378,24 @@ public class BinaryGate extends Gate{
 		return str;
 	}
 
+<<<<<<< HEAD
 	@Override
 	public ArrayList<Gate> getBaseInputs() {
 		// TODO Auto-generated method stub
 		return null;
+=======
+	public ArrayList<Gate> getBaseInputs() {
+		ArrayList<Gate> ins = new ArrayList<Gate>();
+		if(input1!=null) {
+			ins.addAll(input1.getBaseInputs());
+		}
+		
+		if(input2!=null) {
+			ins.addAll(input2.getBaseInputs());
+		}
+		
+		return ins;
+>>>>>>> woky worky done by max and mark splash screen
 	}
 	
 	
