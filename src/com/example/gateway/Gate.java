@@ -20,6 +20,8 @@ public abstract class Gate {
 	public abstract String getHelp();
 	protected abstract void flipInPath();
 	public abstract Gate disconnectWire(MotionEvent event);
+	public boolean isInput() { return false; }
+	public abstract ArrayList<Gate> getBaseInputs();
 	
 	protected Bitmap bitmap;
 	protected float x;

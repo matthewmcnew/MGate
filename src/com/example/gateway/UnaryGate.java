@@ -238,4 +238,19 @@ public class UnaryGate extends Gate {
 		return str;
 	}
 
+	@Override
+	public ArrayList<Gate> getBaseInputs() {
+		
+		if(input!=null) {
+			if(input.isInput()) {
+				return getInputs();
+			} else {
+				return input.getBaseInputs();
+			}
+		} else {
+			ArrayList<Gate> ins = new ArrayList<Gate>();
+			return ins;
+		}
+	}
+
 }

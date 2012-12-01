@@ -39,6 +39,10 @@ public class Input extends Gate {
 		return out();
 	}
 	
+	public boolean isInput() {
+		return true;
+	}
+	
 	public boolean inPath(Gate g) {
 		return false;
 	}
@@ -115,6 +119,13 @@ public class Input extends Gate {
 	
 	protected void flipInPath(){
 		inPath = !inPath;
+	}
+
+	@Override
+	public ArrayList<Gate> getBaseInputs() {
+		ArrayList<Gate> ins = new ArrayList<Gate>();
+		ins.add(this);
+		return ins;
 	}
 	
 }
