@@ -68,6 +68,10 @@ public class UnaryGate extends Gate {
 		input = g;
 	}
 	
+	public void addInput(Gate g) {
+		setInput(g);
+	}
+	
 	public int getOutput() {
 		int in;
 		
@@ -125,7 +129,6 @@ public class UnaryGate extends Gate {
 				if(input != null) {
 					return input;
 				}
-					
 			}
 		}
 
@@ -133,7 +136,9 @@ public class UnaryGate extends Gate {
 	}
 	
 	public void clearInput(Gate input) {
-		input = null;
+		if(this.input == input) {
+			this.input = null;
+		}
 	}
 	
 	public boolean snapWire(MotionEvent event, Gate selected) {
@@ -174,6 +179,11 @@ public class UnaryGate extends Gate {
 				c.drawBitmap(circles.get(4), x+bitmap.getWidth()-19, y + bitmap.getHeight()/2 - 12, null);
 			}
 			
+			if(glowing) {
+				//Draw Circle mark
+				c.drawBitmap(circles.get(6), x+bitmap.getWidth()-26, y + bitmap.getHeight()/2 - 19, null);
+			}
+			
 		} else {
 			if (input != null) {
 				c.drawBitmap(circles.get(0), x-25, y + bitmap.getHeight()/2 - 12, null);
@@ -185,14 +195,75 @@ public class UnaryGate extends Gate {
 	public void drawWires(Canvas c) {
 		if(!selected) {
 			if(!(input == null || input.isDeleted())) {
-				c.drawLine(x-25, y + bitmap.getHeight()/2, input.getOutputX(), input.getOutputY(), paint);
+				c.drawLine(x-13, y + bitmap.getHeight()/2, input.getOutputX(), input.getOutputY(), paint);
 			}
 		} else {
 			if (input != null) {
-				c.drawLine(x-25, y + bitmap.getHeight()/2, input.getOutputX(), input.getOutputY(), paint);
+				c.drawLine(x-13, y + bitmap.getHeight()/2, input.getOutputX(), input.getOutputY(), paint);
 				
 			}
 		}
+	}
+	
+	public void deleteWires(float x1, float y1, float x2, float y2) {
+		//If user swiped right to left, reverse the coordinates
+				if(x1>x2) {
+					float t = x2;
+					x2 = x1;
+					x1 = t;
+					
+					t = y2;
+					y2 = y1;
+					y1 = t;
+				}
+				
+				// Calc the swipe m and b
+				float m = (y2-y1)/(x2-x1);
+				float b = y1 - (x1*m);
+				
+				//Delete the wire on input1 if necessary
+				if(input != null && !input.isDeleted()) {
+					
+					float wy1, wy2, wx1, wx2;
+					
+					//Determine the rightmost point
+					if(input.getOutputX() > x-25) {
+						wx2 = input.getOutputX();
+						wy2 = input.getOutputY();
+						
+						wx1 = x - 25;
+						wy1 = y + 19;
+					} else {
+						wx1 = input.getOutputX();
+						wy1 = input.getOutputY();
+						
+						wx2 = x - 25;
+						wy2 = y + 19;
+					}
+					
+					//Calc the m and b for the wire
+					float wm = (wy2-wy1)/(wx2-wx1);
+					float wb = wy1 - (wx1*wm);
+					
+					//Make sure lines are not parallel, therefore they intersect
+					if(wm != m) {
+
+						
+						//Calculate x and y of intersection
+						float ix = (b-wb)/(wm-m);
+						float iy = (ix*m) + b;
+						
+						//Check the x coordinate
+						if((ix > wx1) && (ix < wx2) && (ix > x1) && (ix < x2)) {
+							
+							//Check the y coordinate
+							if((((iy > wy1) && (iy < wy2)) || ((iy < wy1) && (iy > wy2))) && (((iy > y1) && (iy < y2)) || ((iy < y1) && (iy > y2)))) {
+								
+								input = null;
+							}
+						}
+					}
+				}
 	}
 	
 	protected void setInPath(boolean state){
@@ -246,6 +317,20 @@ public class UnaryGate extends Gate {
 			ins.addAll(input.getBaseInputs());
 		}
 		return ins;
+	}
+	
+	public boolean isConnecting(Gate g){
+		if((Math.abs(g.getOutputX()-10 - (x-25)) < 15) && (Math.abs(g.getOutputY() - (y + bitmap.getHeight()/2 - 12)) < 15)) {
+			if(!g.inPath(this))
+				return true;
+		}
+		
+		return false;
+	}
+	@Override
+	public boolean inGate(MotionEvent event){
+		return((event.getX() > x && event.getX() < (x + bitmap.getWidth() * (2.0/3.0))) && (event.getY() > y && event.getY() < (y + bitmap.getHeight())));
+				
 	}
 
 }

@@ -22,6 +22,8 @@ public abstract class Gate {
 	public abstract Gate disconnectWire(MotionEvent event);
 	public boolean isInput() { return false; }
 	public abstract ArrayList<Gate> getBaseInputs();
+	public abstract boolean isConnecting(Gate g);
+	public abstract void deleteWires(float x1, float y1, float x2, float y2);
 	
 	protected Bitmap bitmap;
 	protected float x;
@@ -31,6 +33,7 @@ public abstract class Gate {
 	protected boolean wiring = false;
 	protected boolean deleted = false;
 	protected boolean inPath = false;
+	protected boolean glowing = false;
 		
 	protected static Paint paint = new Paint();
 	
@@ -62,6 +65,7 @@ public abstract class Gate {
 	
 	public void draw(Canvas c,ArrayList<Bitmap> circles) {
 		Gateway.p("Drawing gate...");
+		paint.setStrokeWidth(3);
 		if(deleting) {
 			Paint p = new Paint(Paint.FILTER_BITMAP_FLAG);
 			p.setFilterBitmap(true);
@@ -91,6 +95,8 @@ public abstract class Gate {
 		Gateway.p("Getting output y...");
 		 return y + bitmap.getHeight()/2;	
 	}
+	
+	// 
 	
 	public Bitmap getBitmap() {
 		return bitmap;
@@ -140,6 +146,10 @@ public abstract class Gate {
 	
 	public void clearInput(Gate input){
 		return;
+	}
+	
+	public void setGlowing(boolean glow){
+		glowing = glow;
 	}
 	
 }

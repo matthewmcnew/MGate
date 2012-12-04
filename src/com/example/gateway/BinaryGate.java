@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.Log;
 import android.view.MotionEvent;
 
 
@@ -16,6 +17,8 @@ public class BinaryGate extends Gate{
 	private Gate input2;
 	private int literal1;
 	private int literal2;
+	
+	private int cNode;
 	
 	public BinaryGate() {
 		//Initialize a standard gate to only output zero
@@ -86,6 +89,14 @@ public class BinaryGate extends Gate{
 	public void setInput(Gate g){
 		input1 = g;
 		input2 = null;
+	}
+	
+	public void addInput(Gate g) {
+		if(cNode == 1) {
+			input1 = g;
+		} else {
+			input2 = g;
+		}
 	}
 
 	public int getOutput() {
@@ -264,6 +275,10 @@ public class BinaryGate extends Gate{
 			}else if(getOutput() == 1) {
 				c.drawBitmap(circles.get(4), x+bitmap.getWidth()-19, y + bitmap.getHeight()/2 - 12, null);
 			}
+			if(glowing) {
+				//Draw Circle mark
+				c.drawBitmap(circles.get(6), x+bitmap.getWidth()-26, y + bitmap.getHeight()/2 - 19, null);
+			}
 			
 			
 		} else {
@@ -275,16 +290,122 @@ public class BinaryGate extends Gate{
 				c.drawBitmap(circles.get(0), x-25, y + 40, null);
 			}
 		}
-		
 	}
 	
-	public void drawWires(Canvas c) {
+	public static void p(Object o) {
+		System.out.println(o);
+	}
+	
+	public void deleteWires(float x1, float y1, float x2, float y2) {
+				
+		//If user swiped right to left, reverse the coordinates
+		if(x1>x2) {
+			float t = x2;
+			x2 = x1;
+			x1 = t;
+			
+			t = y2;
+			y2 = y1;
+			y1 = t;
+		}
+		
+		// Calc the swipe m and b
+		float m = (y2-y1)/(x2-x1);
+		float b = y1 - (x1*m);
+		
+		//Delete the wire on input1 if necessary
 		if(input1 != null && !input1.isDeleted()) {
-			c.drawLine(x-25, y + 19, input1.getOutputX(), input1.getOutputY(), paint);
+			
+			float wy1, wy2, wx1, wx2;
+			
+			//Determine the rightmost point
+			if(input1.getOutputX() > x-25) {
+				wx2 = input1.getOutputX();
+				wy2 = input1.getOutputY();
+				
+				wx1 = x - 25;
+				wy1 = y + 19;
+			} else {
+				wx1 = input1.getOutputX();
+				wy1 = input1.getOutputY();
+				
+				wx2 = x - 25;
+				wy2 = y + 19;
+			}
+			
+			//Calc the m and b for the wire
+			float wm = (wy2-wy1)/(wx2-wx1);
+			float wb = wy1 - (wx1*wm);
+			
+			//Make sure lines are not parallel, therefore they intersect
+			if(wm != m) {
+
+				
+				//Calculate x and y of intersection
+				float ix = (b-wb)/(wm-m);
+				float iy = (ix*m) + b;
+				
+				//Check the x coordinate
+				if((ix > wx1) && (ix < wx2) && (ix > x1) && (ix < x2)) {
+					
+					//Check the y coordinate
+					if((((iy > wy1) && (iy < wy2)) || ((iy < wy1) && (iy > wy2))) && (((iy > y1) && (iy < y2)) || ((iy < y1) && (iy > y2)))) {
+						p("y coord works");
+
+						input1 = null;
+					}
+				}
+			}
+		}
+		
+		//Delete the wire on input2 if necessary
+		if(input2 != null && !input2.isDeleted()) {
+			float wy1, wy2, wx1, wx2;
+
+			//Determine the rightmost point
+			if(input2.getOutputX() > x-25) {
+				wx2 = input2.getOutputX();
+				wy2 = input2.getOutputY();
+
+				wx1 = x - 25;
+				wy1 = y + 19;
+			} else {
+				wx1 = input2.getOutputX();
+				wy1 = input2.getOutputY();
+
+				wx2 = x - 25;
+				wy2 = y + 19;
+			}
+
+			//Calc the m and b for the wire
+			float wm = (wy2-wy1)/(wx2-wx1);
+			float wb = wy1 - (wx1*wm);
+
+			//Make sure lines are not parallel, therefore they intersect
+			if(wm != m) {
+				//Calculate x and y of intersection
+				float ix = (b-wb)/(wm-m);
+				float iy = (ix*m) + b;
+
+				//Check the x coordinate
+				if((ix > wx1) && (ix < wx2) && (ix > x1) && (ix < x2)) {
+					//Check the y coordinate
+					if((((iy > wy1) && (iy < wy2)) || ((iy < wy1) && (iy > wy2))) && (((iy > y1) && (iy < y2)) || ((iy < y1) && (iy > y2)))) {
+						input2 = null;
+					}
+				}
+			}
+		}
+	}
+
+	public void drawWires(Canvas c) {
+		paint.setStrokeWidth(3);
+		if(input1 != null && !input1.isDeleted()) {
+			c.drawLine(x-13, y + 19, input1.getOutputX(), input1.getOutputY(), paint);
 		}
 
 		if(input2 != null && !input2.isDeleted()) {
-			c.drawLine(x-25, y + 52, input2.getOutputX(), input2.getOutputY(), paint);
+			c.drawLine(x-13, y + 52, input2.getOutputX(), input2.getOutputY(), paint);
 		}
 	}
 	
@@ -396,6 +517,23 @@ public class BinaryGate extends Gate{
 		
 		return ins;
 
+	}
+	
+	public boolean isConnecting(Gate g){
+		if(!g.inPath(this))
+		{
+			if((Math.abs(g.getOutputX()-10 - (x-25)) < 15) && (Math.abs(g.getOutputY() - (y + 7)) < 15)) {
+				cNode = 1;
+				return true;
+			}
+			
+			if((Math.abs(g.getOutputX()-10 - (x-25)) < 15) && (Math.abs(g.getOutputY() - (y + 40)) < 15)) {
+				cNode = 2;
+				return true;
+			}			
+		}
+		
+		return false;
 	}
 	
 	

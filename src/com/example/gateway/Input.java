@@ -92,18 +92,23 @@ public class Input extends Gate {
 				}else if(type == Type.ONE) {
 					c.drawBitmap(circles.get(2), x-25, y + bitmap.getHeight()/2 - 12, null);
 				}
-
-				
-				if(getOutput() == 0) {
-					c.drawBitmap(circles.get(3), x+bitmap.getWidth()-19, y + bitmap.getHeight()/2 - 12, null);
-				}else if(getOutput() == 1) {
-					c.drawBitmap(circles.get(4), x+bitmap.getWidth()-19, y + bitmap.getHeight()/2 - 12, null);
-				}
+			}
+			if(getOutput() == 0) {
+				c.drawBitmap(circles.get(3), x+bitmap.getWidth()-19, y + bitmap.getHeight()/2 - 12, null);
+			}else if(getOutput() == 1) {
+				c.drawBitmap(circles.get(4), x+bitmap.getWidth()-19, y + bitmap.getHeight()/2 - 12, null);
+			}
+			
+			if(glowing) {
+				//Draw Circle mark
+				c.drawBitmap(circles.get(6), x+bitmap.getWidth()-26, y + bitmap.getHeight()/2 - 19, null);
 			}
 			
 		}
 		
 	}
+	
+	public void deleteWires(float x1, float y1, float x2, float y2) {}
 
 	public String getHelp() {
 		String str = "";
@@ -126,6 +131,10 @@ public class Input extends Gate {
 		ArrayList<Gate> ins = new ArrayList<Gate>();
 		ins.add(this);
 		return ins;
+	}
+	
+	public boolean isConnecting(Gate g){
+		return false;
 	}
 	
 }

@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -39,13 +40,19 @@ public class Gateway extends Activity  {
         private ArrayList<Gate> gates;
         private ArrayList<Bitmap> menu; 
         private ArrayList<Bitmap> circles; 
+        private Gate glowing =  null;
+        private long time;
         DisplayMetrics metrics;
+        
+        boolean cuttingMode = false;
+        float cutX,cutY;
         
         Gate selected;
         Gate modifyingOutputGate;
         
         float wireX,wireY;
         float beginX,beginY;
+        
         
         int menuItem = -2;
         
@@ -66,6 +73,7 @@ public class Gateway extends Activity  {
             gates.add(newGate);
             gates.get(1).setInput(gates.get(0));
             gates.get(2).setInput(gates.get(0));
+            this.invalidate();
         }
 		
 		protected void onDraw(Canvas canvas) {
@@ -73,6 +81,7 @@ public class Gateway extends Activity  {
 			
 			if(modifyingOutputGate != null){
 				paint.setColor(Color.GREEN);
+				paint.setStrokeWidth(4);
 				canvas.drawLine( beginX, beginY, wireX, wireY, paint);
 			}
 			
@@ -89,21 +98,26 @@ public class Gateway extends Activity  {
 		}
 		
 		private void drawMenu(Canvas canvas) {		 
-			paint.setColor(0xff222222); //grey
-			//canvas.drawRect(left, top, right, bottom, paint)
-			canvas.drawRect(0, 0, metrics.widthPixels+10, menu.get(1).getHeight(), paint);
-			Paint p = new Paint(Paint.FILTER_BITMAP_FLAG);
-			p.setFilterBitmap(true);
-			p.setColorFilter(new LightingColorFilter(65280,0xFFFFFF));    //white
+			paint.setColor(0xffe5e5e5); //grey
 			
-			if((selected == null)) {	
+			Paint p = new Paint(Paint.FILTER_BITMAP_FLAG);
+			p.setStrokeWidth(2);
+			
+			canvas.drawRect(0, 0, metrics.widthPixels+10, menu.get(1).getHeight()+10, paint);
+			
+			canvas.drawLine(0, menu.get(1).getHeight()+10,metrics.widthPixels+5, menu.get(1).getHeight()+10, p);
+			
+			p.setFilterBitmap(true);
+			//p.setColorFilter(new LightingColorFilter(65280,0xFFFFFF));    //white
+			
+				
 				int distance = 0;
 				int count = -1;
 				for(Bitmap b : menu){
 					if(menuItem == count){
 						p.setColorFilter(new LightingColorFilter(65280,65280)); // green
 						canvas.drawBitmap(b, distance, 0, p);
-						p.setColorFilter(new LightingColorFilter(65280,0xFFFFFF));  
+						p.setColorFilter(new LightingColorFilter(65280,0x0000000));  
 					}else {
 						canvas.drawBitmap(b, distance, 0, p);
 					}
@@ -113,8 +127,13 @@ public class Gateway extends Activity  {
 				}	
 				
 				
-			}else{
-				canvas.drawBitmap(remove, ((metrics.widthPixels)/2) - remove.getWidth()/2  , 0, null);
+			if((selected != null)) {
+				if(selected.isDeleting()){
+					p.setFilterBitmap(true);
+					p.setColorFilter(new LightingColorFilter(65280,0xFF0000)); // RED
+					canvas.drawBitmap(remove, ((metrics.widthPixels)) - remove.getWidth()  , 0, p);
+				}
+				canvas.drawBitmap(remove, ((metrics.widthPixels)) - remove.getWidth()  , 0, null);
 			}
 
 		}
@@ -138,31 +157,6 @@ public class Gateway extends Activity  {
 		        	//Gate newGate = null;
 					for(Bitmap bitmap : menu){
 						if(event.getX() < ( bitmap.getWidth() + distance) && event.getX() > distance && event.getY() < bitmap.getHeight() ){
-//							switch(count) {
-//							case -1:
-//								newGate = new Input(Input.Type.ZERO,bitmap,event.getX(),event.getY());
-//								break;
-//							case 0:
-//								newGate = new BinaryGate(BinaryGate.Type.AND,bitmap,event.getX(),event.getY());
-//								break;
-//							case 1:
-//								newGate = new BinaryGate(BinaryGate.Type.NAND,bitmap,event.getX(),event.getY());
-//								break;
-//							case 2:
-//								newGate = new BinaryGate(BinaryGate.Type.NOR,bitmap,event.getX(),event.getY());
-//								break;
-//							case 3:
-//								newGate = new UnaryGate(UnaryGate.Type.NOT,bitmap,event.getX(),event.getY());
-//								break;
-//							case 4:
-//								newGate = new BinaryGate(BinaryGate.Type.OR,bitmap,event.getX(),event.getY());
-//								break;
-//							case 5:
-//								newGate = new BinaryGate(BinaryGate.Type.XOR,bitmap,event.getX(),event.getY());
-//								break;
-//							}
-//							gates.add(newGate);
-//							select(newGate);
 							menuItem = count;
 							break;
 						}
@@ -219,10 +213,25 @@ public class Gateway extends Activity  {
 					}					
 					
 					this.invalidate();
+					
+					if(modifyingOutputGate == null && selected == null){
+						cuttingMode = true;
+						cutX = event.getX();
+						cutY = event.getY();
+					}
 
 		            break;
 
 		        case MotionEvent.ACTION_MOVE:
+		        	
+		        	Log.d("swipe","cutting mode: " + cuttingMode);
+		        	
+		        	if(cuttingMode) {
+		        		for(Gate g : gates){ 
+		        			g.deleteWires(cutX, cutY, event.getX(), event.getY());
+		        		}
+		        	}
+		        	
 		        	
 		        	if(menuItem != -2 && (event.getY() > (menu.get(menuItem+1).getHeight()+menu.get(menuItem+1).getHeight()/2))){
 		        		Gate newGate = null;
@@ -251,6 +260,7 @@ public class Gateway extends Activity  {
 						}
 						gates.add(newGate);
 						select(newGate);
+						cuttingMode = false;
 		        		
 		        		menuItem = -2;
 		        		
@@ -259,7 +269,8 @@ public class Gateway extends Activity  {
 		        	
 		        	if(selected != null)
 		        	{
-		        		if(event.getY() < menu.get(0).getHeight()){
+		        		//Delete that crap
+		        		if(event.getY() < (menu.get(1).getHeight()+10 + selected.bitmap.getHeight()/2)){
 		        			selected.setDeleting(true);
 		        		} else {
 		        			selected.setDeleting(false);
@@ -267,11 +278,36 @@ public class Gateway extends Activity  {
 		        		
 		        		selected.setX(event.getX() - selected.bitmap.getWidth()/2);
 		        		selected.setY(event.getY() - selected.bitmap.getHeight()/2); 
+		        			        		
 		        		
 		        		if(modifyingOutputGate != null) {
 		        			beginX = modifyingOutputGate.getOutputX();
 		        			beginY = modifyingOutputGate.getOutputY();
 		        		}
+		        		
+		        		//
+		        		if(glowing != null) {
+		        			if(!selected.isConnecting(glowing) ) {
+		        				if(System.currentTimeMillis() > (time + 375)) {
+		        					glowing.setGlowing(false);	
+		        					selected.addInput(glowing);		        					
+		        				}
+		        				else {
+			        				glowing.setGlowing(false);
+			        				glowing = null;
+		        				}
+		        			}
+		        		} else {
+			        		for(Gate g : gates){ 
+			        			if(selected.isConnecting(g)) {
+			        				g.setGlowing(true);
+			        				glowing = g;
+			        				time = System.currentTimeMillis();
+			        				break;
+			        			}
+			        		}
+		        		}
+		        		
 		        	}else if(modifyingOutputGate != null) {
 		        		wireX = event.getX();
 		        		wireY = event.getY();
@@ -279,8 +315,18 @@ public class Gateway extends Activity  {
 		        	this.invalidate();
 		            // finger moves on the screen
 		            break;
-
+//
 		        case MotionEvent.ACTION_UP:
+		        	cuttingMode = false;
+		        	
+		        	if(glowing != null) {
+		        		if(System.currentTimeMillis() > (time + 500)) {
+		        			selected.addInput(glowing);		
+		        		}
+		        		glowing.setGlowing(false);
+		        		glowing = null;
+		        	}
+		        	
 		        	
 		        	if(menuItem != -2){
 		        		menuItem = -2;
@@ -341,7 +387,7 @@ public class Gateway extends Activity  {
             xor = BitmapFactory.decodeResource(getResources(),
                     R.drawable.xor); 
             remove = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.remove);
+                    R.drawable.trashcanremove);
             
             menu = new ArrayList<Bitmap>();
             menu.add(input);
@@ -369,6 +415,8 @@ public class Gateway extends Activity  {
                     R.drawable.outputnode1));
             circles.add(BitmapFactory.decodeResource(getResources(),
                     R.drawable.cantwire1));
+            circles.add(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.halo));
             
             
 		}
@@ -386,4 +434,6 @@ public class Gateway extends Activity  {
     public static void p(Object o) {
     	//System.out.println(o);
     }
+    
+
 }

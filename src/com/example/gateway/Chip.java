@@ -121,6 +121,13 @@ public class Chip extends Gate{
 		return getInputs();
 
 	}
+	
+	public boolean isConnecting(Gate g){
+		return false;
+	}
+	
+	public void deleteWires(float x1, float y1, float x2, float y2) {}
+
 
 
 
