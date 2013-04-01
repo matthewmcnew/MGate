@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
@@ -53,6 +54,11 @@ public class Gateway extends Activity  {
         float wireX,wireY;
         float beginX,beginY;
         
+        //Scrollbar stuff
+        boolean colorWires = false;
+        int mstart = 0;
+        float scrollX = 0;
+        boolean scrolling = false;
         
         int menuItem = -2;
         
@@ -103,15 +109,18 @@ public class Gateway extends Activity  {
 			Paint p = new Paint(Paint.FILTER_BITMAP_FLAG);
 			p.setStrokeWidth(2);
 			
-			canvas.drawRect(0, 0, metrics.widthPixels+10, menu.get(1).getHeight()+10, paint);
+			canvas.drawRect(0, 0, metrics.widthPixels+10, menu.get(1).getHeight()+30, paint);
 			
 			canvas.drawLine(0, menu.get(1).getHeight()+10,metrics.widthPixels+5, menu.get(1).getHeight()+10, p);
+
+			//Draw scrollbar
+			canvas.drawLine(0, menu.get(1).getHeight()+30,metrics.widthPixels+5, menu.get(1).getHeight()+30, p);
 			
 			p.setFilterBitmap(true);
 			//p.setColorFilter(new LightingColorFilter(65280,0xFFFFFF));    //white
 			
 				
-				int distance = 0;
+				int distance = mstart;
 				int count = -1;
 				for(Bitmap b : menu){
 					if(menuItem == count){
@@ -124,10 +133,18 @@ public class Gateway extends Activity  {
 					
 					distance = distance + b.getWidth();
 					count++;
-				}	
+				}		
+				
+				//Draw scrollbar
+				float w = metrics.widthPixels;
+				float m = distance; if(m<w) m=w;
+				float ln = ((w/m)*w);
+				canvas.drawRoundRect(new RectF((scrollX/m)*(w-ln), menu.get(1).getHeight()+12,w-(((w-scrollX)/w)*ln), menu.get(1).getHeight()+28),8,8,p);
 				
 				
 			if((selected != null)) {
+				canvas.drawRect(0, 0, metrics.widthPixels+10, menu.get(1).getHeight()+10, paint);
+				
 				if(selected.isDeleting()){
 					p.setFilterBitmap(true);
 					p.setColorFilter(new LightingColorFilter(65280,0xFF0000)); // RED
@@ -162,6 +179,11 @@ public class Gateway extends Activity  {
 						}
 						distance = distance + bitmap.getWidth();
 						count++;
+					}
+					
+					//Scroll touch?
+					if((event.getY() > menu.get(1).getHeight()+12) && (event.getY() < menu.get(1).getHeight()+28)) {
+						scrolling = true;
 					}
 					
 					// touch an input or output
@@ -214,7 +236,7 @@ public class Gateway extends Activity  {
 					
 					this.invalidate();
 					
-					if(modifyingOutputGate == null && selected == null){
+					if(modifyingOutputGate == null && selected == null && scrolling == false){
 						cuttingMode = true;
 						cutX = event.getX();
 						cutY = event.getY();
@@ -230,6 +252,16 @@ public class Gateway extends Activity  {
 		        		for(Gate g : gates){ 
 		        			g.deleteWires(cutX, cutY, event.getX(), event.getY());
 		        		}
+		        	}
+		        	
+		        	//Scrolling
+		        	int d = 0;
+					for(Bitmap bitmap : menu){
+						d = d + bitmap.getWidth();
+					}
+		        	if(scrolling) {
+		        		scrollX = event.getX();
+		        		mstart = (int)((scrollX/metrics.widthPixels)*(metrics.widthPixels-d));
 		        	}
 		        	
 		        	
@@ -390,6 +422,14 @@ public class Gateway extends Activity  {
                     R.drawable.trashcanremove);
             
             menu = new ArrayList<Bitmap>();
+            menu.add(input);
+            menu.add(and);
+            menu.add(nand);
+            menu.add(nor);
+            menu.add(not);
+            menu.add(or);
+            menu.add(xor);
+
             menu.add(input);
             menu.add(and);
             menu.add(nand);
