@@ -121,6 +121,7 @@ public class Gateway extends Activity  {
 			
 				
 				int distance = mstart;
+				float m = 0;
 				int count = -1;
 				for(Bitmap b : menu){
 					if(menuItem == count){
@@ -130,16 +131,16 @@ public class Gateway extends Activity  {
 					}else {
 						canvas.drawBitmap(b, distance, 0, p);
 					}
-					
+					m+=b.getWidth();
 					distance = distance + b.getWidth();
 					count++;
 				}		
 				
 				//Draw scrollbar
 				float w = metrics.widthPixels;
-				float m = distance; if(m<w) m=w;
-				float ln = ((w/m)*w);
-				canvas.drawRoundRect(new RectF((scrollX/m)*(w-ln), menu.get(1).getHeight()+12,w-(((w-scrollX)/w)*ln), menu.get(1).getHeight()+28),8,8,p);
+				if(m<w) m=w;
+				float ln = ((w/(float)m)*w);
+				canvas.drawRoundRect(new RectF((scrollX/w)*(w-ln), menu.get(1).getHeight()+12, w-((w-scrollX)/w)*(w-ln), menu.get(1).getHeight()+28),8,8,p);
 				
 				
 			if((selected != null)) {
