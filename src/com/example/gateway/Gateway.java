@@ -170,7 +170,7 @@ public class Gateway extends Activity  {
 		        case MotionEvent.ACTION_DOWN: 
 		        	
 		        	//menu touch?
-		        	int distance = 0;
+		        	int distance = mstart;
 		        	int count = -1;
 		        	//Gate newGate = null;
 					for(Bitmap bitmap : menu){
@@ -263,6 +263,7 @@ public class Gateway extends Activity  {
 		        	if(scrolling) {
 		        		scrollX = event.getX();
 		        		mstart = (int)((scrollX/metrics.widthPixels)*(metrics.widthPixels-d));
+		        		if(mstart > 0) mstart = 0;
 		        	}
 		        	
 		        	
@@ -289,7 +290,7 @@ public class Gateway extends Activity  {
 							break;
 						case 5:
 							newGate = new BinaryGate(BinaryGate.Type.XOR,menu.get(menuItem+1),event.getX(),event.getY());
-							break;
+							break;	
 						}
 						gates.add(newGate);
 						select(newGate);
@@ -351,6 +352,7 @@ public class Gateway extends Activity  {
 //
 		        case MotionEvent.ACTION_UP:
 		        	cuttingMode = false;
+		        	scrolling = false;
 		        	
 		        	if(glowing != null) {
 		        		if(System.currentTimeMillis() > (time + 500)) {
@@ -423,14 +425,6 @@ public class Gateway extends Activity  {
                     R.drawable.trashcanremove);
             
             menu = new ArrayList<Bitmap>();
-            menu.add(input);
-            menu.add(and);
-            menu.add(nand);
-            menu.add(nor);
-            menu.add(not);
-            menu.add(or);
-            menu.add(xor);
-
             menu.add(input);
             menu.add(and);
             menu.add(nand);
