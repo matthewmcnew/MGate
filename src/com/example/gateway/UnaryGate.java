@@ -108,9 +108,9 @@ public class UnaryGate extends Gate {
 		}
 	}
 	
-	public boolean inputFlip(MotionEvent event) {
-		if(event.getX() > (x-35) && event.getX() < (x+22) ){
-			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()) ){
+	public boolean inputFlip(float eX, float eY) {
+		if(eX > (x-35) && eX < (x+22) ){
+			if(eY > (y-5) && eY < (y+bitmap.getHeight()) ){
 				System.out.print("insideFlip -----------------------------------------------------------------------------------\n");
 				if(input == null)
 					flipLiteral();
@@ -141,9 +141,9 @@ public class UnaryGate extends Gate {
 		}
 	}
 	
-	public boolean snapWire(MotionEvent event, Gate selected) {
-		if(event.getX() > (x-35) && event.getX() < (x+22) ){
-			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()) ){
+	public boolean snapWire(float eX, float eY, Gate selected) {
+		if(eX > (x-35) && eX < (x+22) ){
+			if(eY > (y-5) && eY < (y+bitmap.getHeight()) ){
 				if(selected != this && !selected.inPath(this)) {
 					input = selected;
 					return true;
@@ -328,8 +328,8 @@ public class UnaryGate extends Gate {
 		return false;
 	}
 	@Override
-	public boolean inGate(MotionEvent event){
-		return((event.getX() > x && event.getX() < (x + bitmap.getWidth() * (2.0/3.0))) && (event.getY() > y && event.getY() < (y + bitmap.getHeight())));
+	public boolean inGate(float eX, float eY){
+		return((eX > x && eX < (x + bitmap.getWidth() * (2.0/3.0))) && (eY > y && eY < (y + bitmap.getHeight())));
 				
 	}
 

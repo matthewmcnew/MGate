@@ -49,14 +49,14 @@ public abstract class Gate {
 		System.out.print("Warning: gate does not take double input");
 	}
 	
-	public abstract boolean inputFlip(MotionEvent event);
-	public abstract boolean snapWire(MotionEvent event, Gate input);
+	public abstract boolean inputFlip(float eX, float eY);
+	public abstract boolean snapWire(float eX, float eY, Gate input);
 	
 	
 	
-	public boolean outputTouched(MotionEvent event) {
-		if(event.getX() > (x + bitmap.getWidth() + -35) && event.getX() < (x+ bitmap.getWidth() + 22) ){
-			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()) ){
+	public boolean outputTouched(float eX, float eY) {
+		if(eX > (x + bitmap.getWidth() + -35) && eX < (x+ bitmap.getWidth() + 22) ){
+			if(eY > (y-5) && eY < (y+bitmap.getHeight()) ){
 				return true;
 			}
 		}	
@@ -102,8 +102,8 @@ public abstract class Gate {
 		return bitmap;
 	}
 	
-	public boolean inGate(MotionEvent event){
-		return((event.getX() > x && event.getX() < (x + bitmap.getWidth() * (3.0/4.0))) && (event.getY() > y && event.getY() < (y + bitmap.getHeight())));
+	public boolean inGate(float eX, float eY){
+		return((eX > x && eX < (x + bitmap.getWidth() * (3.0/4.0))) && (eY > y && eY < (y + bitmap.getHeight())));
 				
 	}
 	

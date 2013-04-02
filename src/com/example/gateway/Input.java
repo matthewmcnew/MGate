@@ -55,9 +55,9 @@ public class Input extends Gate {
 		return new Input(this.type, this.bitmap, this.x, this.y );
 	}
 	
-	public boolean inputFlip(MotionEvent event) {
-		if(event.getX() > (x-35) && event.getX() < (x+22) ){
-			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()) ){
+	public boolean inputFlip(float eX, float eY) {
+		if(eX > (x-35) && eX < (x+22) ){
+			if(eY > (y-5) && eY < (y+bitmap.getHeight()) ){
 				flipLiteral();
 				return true;
 			}
@@ -69,7 +69,7 @@ public class Input extends Gate {
 		return null;
 	}
 	
-	public boolean snapWire(MotionEvent event, Gate selected) {
+	public boolean snapWire(float eX, float eY, Gate selected) {
 		return false;
 	}
 	

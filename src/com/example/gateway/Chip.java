@@ -128,6 +128,18 @@ public class Chip extends Gate{
 	
 	public void deleteWires(float x1, float y1, float x2, float y2) {}
 
+	@Override
+	public boolean inputFlip(float eX, float eY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean snapWire(float eX, float eY, Gate input) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 
 
 

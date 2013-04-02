@@ -170,16 +170,16 @@ public class BinaryGate extends Gate{
 		}
 	}
 	
-	public boolean inputFlip(MotionEvent event) {
-		if(event.getX() > (x-35) && event.getX() < (x+22) ){
-			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()/2) ){
+	public boolean inputFlip(float eX, float eY) {
+		if(eX > (x-35) && eX < (x+22) ){
+			if(eY > (y-5) && eY < (y+bitmap.getHeight()/2) ){
 				if(input1 == null)
 					flipLiteral(0);				
 				return true;
 			}
 		}
-		if(event.getX() > (x-35) && event.getX() < (x+22) ){
-			if(event.getY() > (y+bitmap.getHeight()/2) && event.getY() < (y+bitmap.getHeight()+5) ){
+		if(eX > (x-35) && eX < (x+22) ){
+			if(eY > (y+bitmap.getHeight()/2) && eY < (y+bitmap.getHeight()+5) ){
 				if(input2 == null)
 					flipLiteral(1);
 				return true;
@@ -219,9 +219,9 @@ public class BinaryGate extends Gate{
 	
 	
 	
-	public boolean snapWire(MotionEvent event, Gate selected) {
-		if(event.getX() > (x-35) && event.getX() < (x+22) ){
-			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()/2) ){
+	public boolean snapWire(float eX, float eY, Gate selected) {
+		if(eX > (x-35) && eX < (x+22) ){
+			if(eY > (y-5) && eY < (y+bitmap.getHeight()/2) ){
 				if(this != selected && !selected.inPath(this)) {
 					Gateway.p(selected);
 					input1 = selected;
@@ -229,8 +229,8 @@ public class BinaryGate extends Gate{
 				}
 			}
 		}
-		if(event.getX() > (x-35) && event.getX() < (x+22) ){
-			if(event.getY() > (y+bitmap.getHeight()/2) && event.getY() < (y+bitmap.getHeight()+5) ){
+		if(eX > (x-35) && eX < (x+22) ){
+			if(eY > (y+bitmap.getHeight()/2) && eY < (y+bitmap.getHeight()+5) ){
 				if(this != selected && !selected.inPath(this)) {
 					input2 = selected;
 					return true;
