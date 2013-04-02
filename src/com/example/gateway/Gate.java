@@ -19,7 +19,7 @@ public abstract class Gate {
 	public abstract void drawWires(Canvas c);
 	public abstract String getHelp();
 	protected abstract void setInPath(boolean state);
-	public abstract Gate disconnectWire(MotionEvent event);
+	public abstract Gate disconnectWire(float eX, float eY);
 	public boolean isInput() { return false; }
 	public abstract ArrayList<Gate> getBaseInputs();
 	public abstract boolean isConnecting(Gate g);

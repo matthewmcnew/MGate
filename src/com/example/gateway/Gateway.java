@@ -37,7 +37,7 @@ public class Gateway extends Activity  {
 	class PlayAreaView extends View {
 
 
-		private Bitmap and,or,nand,nor,not,xor,remove,input;
+		private Bitmap and,or,nand,nor,not,xor,nxor,buff,remove,input;
 		private ArrayList<Gate> gates;
 		private ArrayList<Bitmap> menu; 
 		private ArrayList<Bitmap> circles; 
@@ -194,7 +194,7 @@ public class Gateway extends Activity  {
 						// touch an input or output
 						for(Gate g : gates){
 							//This needs to be cleaned up someday.  
-							Gate testingGate = g.disconnectWire(event);
+							Gate testingGate = g.disconnectWire(event.getX()/zoom, event.getY()/zoom);
 							if(testingGate != null) {
 								modifyingOutputGate = testingGate;
 								modifyingOutputGate.flipWiring();
@@ -203,8 +203,8 @@ public class Gateway extends Activity  {
 								beginX = modifyingOutputGate.getOutputX();
 								beginY = modifyingOutputGate.getOutputY();
 
-								wireX = event.getX();
-								wireY = event.getY();
+								wireX = event.getX()/zoom;
+								wireY = event.getY()/zoom;
 
 								this.invalidate();
 								return true;
@@ -294,6 +294,12 @@ public class Gateway extends Activity  {
 						break;
 					case 5:
 						newGate = new BinaryGate(BinaryGate.Type.XOR,menu.get(menuItem+1),event.getX(),event.getY());
+						break;
+					case 6:
+						newGate = new BinaryGate(BinaryGate.Type.EQUIV,menu.get(menuItem+1),event.getX(),event.getY());
+						break;
+					case 7:
+						newGate = new UnaryGate(UnaryGate.Type.BUFF,menu.get(menuItem+1),event.getX(),event.getY());
 						break;	
 					}
 					gates.add(newGate);
@@ -424,7 +430,11 @@ public class Gateway extends Activity  {
 			or = BitmapFactory.decodeResource(getResources(),
 					R.drawable.or);
 			xor = BitmapFactory.decodeResource(getResources(),
-					R.drawable.xor); 
+					R.drawable.xor);
+			nxor = BitmapFactory.decodeResource(getResources(),
+					R.drawable.nxor);
+			buff = BitmapFactory.decodeResource(getResources(),
+					R.drawable.buff); 
 			remove = BitmapFactory.decodeResource(getResources(),
 					R.drawable.trashcanremove);
 
@@ -436,6 +446,8 @@ public class Gateway extends Activity  {
 			menu.add(not);
 			menu.add(or);
 			menu.add(xor);
+			menu.add(nxor);
+			menu.add(buff);
 
 			gates = new ArrayList<Gate>();
 

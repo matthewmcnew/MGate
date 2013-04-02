@@ -65,7 +65,7 @@ public class Input extends Gate {
 		return false;
 	}
 	
-	public Gate disconnectWire(MotionEvent event) {
+	public Gate disconnectWire(float eX, float eY) {
 		return null;
 	}
 	

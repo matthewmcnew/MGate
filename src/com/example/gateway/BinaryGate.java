@@ -189,17 +189,17 @@ public class BinaryGate extends Gate{
 	}
 	
 	//This needs to be dryed up some day. 
-	public Gate disconnectWire(MotionEvent event) {
-		if(event.getX() > (x-35) && event.getX() < (x+22) ){
-			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()/2) ){
+	public Gate disconnectWire(float eX, float eY) {
+		if(eX > (x-35) && eX < (x+22) ){
+			if(eY > (y-5) && eY < (y+bitmap.getHeight()/2) ){
 				if(input1 != null) {
 					return input1;
 				}
 									
 			}
 		}
-		if(event.getX() > (x-35) && event.getX() < (x+22) ){
-			if(event.getY() > (y+bitmap.getHeight()/2) && event.getY() < (y+bitmap.getHeight()+5) ){
+		if(eX > (x-35) && eX < (x+22) ){
+			if(eY > (y+bitmap.getHeight()/2) && eY < (y+bitmap.getHeight()+5) ){
 				if(input2 != null) {
 					return input2;	
 				}

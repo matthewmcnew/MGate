@@ -121,10 +121,10 @@ public class UnaryGate extends Gate {
 	}
 	
 	
-	public Gate disconnectWire(MotionEvent event) {
+	public Gate disconnectWire(float eX, float eY) {
 		
-		if(event.getX() > (x-35) && event.getX() < (x+22) ){
-			if(event.getY() > (y-5) && event.getY() < (y+bitmap.getHeight()) ){
+		if(eX > (x-35) && eX < (x+22) ){
+			if(eY > (y-5) && eY < (y+bitmap.getHeight()) ){
 				System.out.print("inside -----------------------------------------------------------------------------------\n");
 				if(input != null) {
 					return input;

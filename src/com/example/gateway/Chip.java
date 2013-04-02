@@ -140,6 +140,12 @@ public class Chip extends Gate{
 		return false;
 	}
 
+	@Override
+	public Gate disconnectWire(float eX, float eY) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 
 
