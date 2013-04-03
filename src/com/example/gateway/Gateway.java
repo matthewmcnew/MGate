@@ -110,14 +110,24 @@ public class Gateway extends Activity  {
 			}
 
 
+			Gate d = null;
 			for(Gate g : gates){
+				if(g.isDeleting())
+					d=g;
 				g.draw(canvas,circles);
 			}
 			
 			canvas.scale(1/zoom,1/zoom);
 			canvas.translate(dx,dy);
 			drawMenu(canvas);
-
+			
+			//Draw deleting gates on top of menu
+			if(d!=null) {
+				canvas.translate(-dx,-dy);
+				canvas.scale(zoom,zoom);
+				d.drawWires(canvas);
+				d.draw(canvas,circles);
+			}
 		}
 
 		private void drawMenu(Canvas canvas) {		 
