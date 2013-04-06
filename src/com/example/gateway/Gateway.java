@@ -56,11 +56,12 @@ public class Gateway extends Activity  {
 		//Scrollbar stuff
 		int mstart = 0;
 		float scrollX = 0;
+		float sx = -1;
 		boolean scrolling = false;
-
+		
 		//Zoom stuff
 		float zoom = (float)(1.0);
-		boolean zooming = false;
+		boolean zooming = true;
 		float   t0x=0,
 				t1x=0,
 				t0y=10,
@@ -116,6 +117,8 @@ public class Gateway extends Activity  {
 					d=g;
 				g.draw(canvas,circles);
 			}
+			
+			if(zooming) canvas.drawText("Zooming triggered", metrics.widthPixels/2, metrics.heightPixels/2, paint);
 			
 			canvas.scale(1/zoom,1/zoom);
 			canvas.translate(dx,dy);
@@ -195,7 +198,9 @@ public class Gateway extends Activity  {
 
 			switch (eventaction) {
 			case MotionEvent.ACTION_DOWN: 
-
+				
+				zooming = true;
+				
 				//menu touch?
 						int distance = mstart;
 						int count = -1;
@@ -212,6 +217,7 @@ public class Gateway extends Activity  {
 						//Scroll touch?
 						if((event.getY() > menu.get(1).getHeight()+12) && (event.getY() < menu.get(1).getHeight()+28)) {
 							scrolling = true;
+							sx = event.getX();
 						}
 
 						// touch an input or output
@@ -279,8 +285,8 @@ public class Gateway extends Activity  {
 					//Get new coordinates of pointers
 					float nt0x = (metrics.widthPixels/2)+event.getX(0);
 					float nt0y = (metrics.heightPixels/2)+event.getY(0);
-					float nt1x = (metrics.widthPixels/2)+event.getX(1);
-					float nt1y = (metrics.heightPixels/2)+event.getY(1);
+					float nt1x = (metrics.widthPixels/2)-event.getX(0);
+					float nt1y = (metrics.heightPixels/2)-event.getY(0);
 					
 					float distOld = (float)Math.sqrt(((t0x-t1x)*(t0x-t1x))+((t0y-t1y)*(t0y-t1y)));
 					float distNew = (float)Math.sqrt(((nt0x-nt1x)*(nt0x-nt1x))+((nt0y-nt1y)*(nt0y-nt1y)));
@@ -311,12 +317,20 @@ public class Gateway extends Activity  {
 				}
 
 				//Scrolling
-				int d = 0;
+				float d = 0;
 				for(Bitmap bitmap : menu){
 					d = d + bitmap.getWidth();
 				}
 				if(scrolling) {
-					scrollX = event.getX();
+					float w = metrics.widthPixels;
+					if(d<w) d=w;
+					float ln = ((w/(float)d)*w);
+					
+					scrollX+=w*(event.getX()-sx)/(w-ln);
+					if(scrollX < 0) scrollX=0;
+					else if(scrollX > w) scrollX = w;
+					else sx = event.getX();
+					
 					mstart = (int)((scrollX/metrics.widthPixels)*(metrics.widthPixels-d));
 					if(mstart > 0) mstart = 0;
 				}
@@ -332,19 +346,19 @@ public class Gateway extends Activity  {
 						newGate = new BinaryGate(BinaryGate.Type.AND,menu.get(menuItem+1),event.getX(),event.getY());
 						break;
 					case 1:
-						newGate = new BinaryGate(BinaryGate.Type.NAND,menu.get(menuItem+1),event.getX(),event.getY());
-						break;
-					case 2:
-						newGate = new BinaryGate(BinaryGate.Type.NOR,menu.get(menuItem+1),event.getX(),event.getY());
-						break;
-					case 3:
-						newGate = new UnaryGate(UnaryGate.Type.NOT,menu.get(menuItem+1),event.getX(),event.getY());
-						break;
-					case 4:
 						newGate = new BinaryGate(BinaryGate.Type.OR,menu.get(menuItem+1),event.getX(),event.getY());
 						break;
-					case 5:
+					case 2:
+						newGate = new UnaryGate(UnaryGate.Type.NOT,menu.get(menuItem+1),event.getX(),event.getY());
+						break;
+					case 3:
 						newGate = new BinaryGate(BinaryGate.Type.XOR,menu.get(menuItem+1),event.getX(),event.getY());
+						break;
+					case 4:
+						newGate = new BinaryGate(BinaryGate.Type.NAND,menu.get(menuItem+1),event.getX(),event.getY());
+						break;
+					case 5:
+						newGate = new BinaryGate(BinaryGate.Type.NOR,menu.get(menuItem+1),event.getX(),event.getY());
 						break;
 					case 6:
 						newGate = new BinaryGate(BinaryGate.Type.EQUIV,menu.get(menuItem+1),event.getX(),event.getY());
@@ -365,7 +379,7 @@ public class Gateway extends Activity  {
 				if(selected != null)
 				{
 					//Delete that crap
-					if(event.getY() < (menu.get(1).getHeight()+10 + selected.bitmap.getHeight()/2)){
+					if(event.getY() < (menu.get(1).getHeight()+30 + selected.bitmap.getHeight()/2)){
 						selected.setDeleting(true);
 					} else {
 						selected.setDeleting(false);
@@ -457,6 +471,7 @@ public class Gateway extends Activity  {
 				this.invalidate();
 
 				break;
+				
 				//Two touch event (zooming)
 			case MotionEvent.ACTION_POINTER_DOWN:
 				//Another point was just touched, so disable everything
@@ -521,11 +536,11 @@ public class Gateway extends Activity  {
 			menu = new ArrayList<Bitmap>();
 			menu.add(input);
 			menu.add(and);
+			menu.add(or);
+			menu.add(not);
+			menu.add(xor);
 			menu.add(nand);
 			menu.add(nor);
-			menu.add(not);
-			menu.add(or);
-			menu.add(xor);
 			menu.add(nxor);
 			menu.add(buff);
 
