@@ -61,7 +61,7 @@ public class Gateway extends Activity  {
 		
 		//Zoom stuff
 		float zoom = (float)(1.0);
-		boolean zooming = true;
+		boolean zooming = false;
 		float   t0x=0,
 				t1x=0,
 				t0y=10,
@@ -197,10 +197,7 @@ public class Gateway extends Activity  {
 			int eventaction = event.getAction();
 
 			switch (eventaction) {
-			case MotionEvent.ACTION_DOWN: 
-				
-				zooming = true;
-				
+			case MotionEvent.ACTION_DOWN: 				
 				//menu touch?
 						int distance = mstart;
 						int count = -1;
