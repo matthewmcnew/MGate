@@ -58,17 +58,19 @@ public class Gateway extends Activity  {
 		float scrollX = 0;
 		float sx = -1;
 		boolean scrolling = false;
-		
+
 		//Zoom stuff
-		float zoom = (float)(1.0);
+		float zoom = (float)(1);
 		boolean zooming = false;
 		float   t0x=0,
 				t1x=0,
-				t0y=10,
-				t1y=10;
+				t0y=0,
+				t1y=0;
 		float dx=0;
 		float dy=0;
-		
+		float cx=0;
+		float cy=0;
+
 		int menuItem = -2;
 
 		private Paint paint = new Paint();
@@ -92,13 +94,19 @@ public class Gateway extends Activity  {
 		}
 
 		protected void onDraw(Canvas canvas) {
-//			drawMenu(canvas);
-			
+			//			drawMenu(canvas);
+
+			paint.setColor(Color.BLACK);
+
+			canvas.drawLine(cx,cy-10,cx,cy+10, paint);
+			canvas.drawLine(cx-10,cy,cx+10,cy, paint);		
+
 			canvas.translate(-dx,-dy);
 			canvas.scale(zoom,zoom);
-			
+
 			paint.setColor(Color.BLACK);
-			
+
+
 			if(modifyingOutputGate != null){
 				paint.setColor(Color.GREEN);
 				paint.setStrokeWidth(4);
@@ -117,17 +125,16 @@ public class Gateway extends Activity  {
 					d=g;
 				g.draw(canvas,circles);
 			}
-			
-			if(zooming) canvas.drawText("Zooming triggered", metrics.widthPixels/2, metrics.heightPixels/2, paint);
-			
+
 			canvas.scale(1/zoom,1/zoom);
 			canvas.translate(dx,dy);
 			drawMenu(canvas);
-			
+
 			//Draw deleting gates on top of menu
 			if(d!=null) {
 				canvas.translate(-dx,-dy);
 				canvas.scale(zoom,zoom);
+
 				d.drawWires(canvas);
 				d.draw(canvas,circles);
 			}
@@ -196,117 +203,133 @@ public class Gateway extends Activity  {
 		public boolean onTouchEvent(MotionEvent event) {
 			int eventaction = event.getAction();
 
+			if(event.getPointerCount()>1)
+				zooming = true;
+			else {
+				zooming = false;
+				t0x = 0;
+				t1x = 0;
+				t0y = 0;
+				t1y = 0;
+			}
+
 			switch (eventaction) {
-			case MotionEvent.ACTION_DOWN: 				
+			case MotionEvent.ACTION_DOWN:
 				//menu touch?
-						int distance = mstart;
-						int count = -1;
-						//Gate newGate = null;
-						for(Bitmap bitmap : menu){
-							if(event.getX() < ( bitmap.getWidth() + distance) && event.getX() > distance && event.getY() < bitmap.getHeight() ){
-								menuItem = count;
-								break;
-							}
-							distance = distance + bitmap.getWidth();
-							count++;
-						}
+				int distance = mstart;
+				int count = -1;
+				//Gate newGate = null;
+				for(Bitmap bitmap : menu){
+					if(event.getX() < ( bitmap.getWidth() + distance) && event.getX() > distance && event.getY() < bitmap.getHeight() ){
+						menuItem = count;
+						break;
+					}
+					distance = distance + bitmap.getWidth();
+					count++;
+				}
 
-						//Scroll touch?
-						if((event.getY() > menu.get(1).getHeight()+12) && (event.getY() < menu.get(1).getHeight()+28)) {
-							scrolling = true;
-							sx = event.getX();
-						}
+				//Scroll touch?
+				if((event.getY() > menu.get(1).getHeight()+12) && (event.getY() < menu.get(1).getHeight()+28)) {
+					scrolling = true;
+					sx = event.getX();
+				}
 
-						// touch an input or output
-						for(Gate g : gates){
-							//This needs to be cleaned up someday.  
-							Gate testingGate = g.disconnectWire((event.getX()+dx)/zoom, (event.getY()+dy)/zoom);
-							if(testingGate != null) {
-								modifyingOutputGate = testingGate;
-								modifyingOutputGate.flipWiring();
-								g.clearInput(modifyingOutputGate);
+				// touch an input or output
+				for(Gate g : gates){
+					//This needs to be cleaned up someday.  
+					Gate testingGate = g.disconnectWire((event.getX()+dx)/zoom, (event.getY()+dy)/zoom);
+					if(testingGate != null) {
+						modifyingOutputGate = testingGate;
+						modifyingOutputGate.flipWiring();
+						g.clearInput(modifyingOutputGate);
 
-								beginX = modifyingOutputGate.getOutputX();
-								beginY = modifyingOutputGate.getOutputY();
+						beginX = modifyingOutputGate.getOutputX();
+						beginY = modifyingOutputGate.getOutputY();
 
-								wireX = (event.getX()+dx)/zoom;
-								wireY = (event.getY()+dy)/zoom;
-
-								this.invalidate();
-								return true;
-
-							}
-
-							else if(g.inputFlip((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
-
-								this.invalidate();
-								break;
-							}
-
-							if(g.outputTouched((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
-								g.flipWiring();
-								modifyingOutputGate = g;
-
-
-								beginX = g.getOutputX();
-								beginY = g.getOutputY();
-
-								wireX = (event.getX()+dx)/zoom;
-								wireY = (event.getY()+dy)/zoom;
-								this.invalidate();
-								break;
-							}
-						}	
-
-						// touch an exisiting one?
-						for(Gate g : gates){
-							if(g.inGate((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
-								select(g);
-							}
-						}					
+						wireX = (event.getX()+dx)/zoom;
+						wireY = (event.getY()+dy)/zoom;
 
 						this.invalidate();
+						return true;
 
-						if(modifyingOutputGate == null && selected == null && scrolling == false){
-							cuttingMode = true;
-							cutX = event.getX();
-							cutY = event.getY();
-						}
+					}
 
+					else if(g.inputFlip((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
+
+						this.invalidate();
 						break;
+					}
+
+					if(g.outputTouched((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
+						g.flipWiring();
+						modifyingOutputGate = g;
+
+
+						beginX = g.getOutputX();
+						beginY = g.getOutputY();
+
+						wireX = (event.getX()+dx)/zoom;
+						wireY = (event.getY()+dy)/zoom;
+						this.invalidate();
+						break;
+					}
+				}	
+
+				// touch an exisiting one?
+				for(Gate g : gates){
+					if(g.inGate((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
+						select(g);
+					}
+				}					
+
+				this.invalidate();
+
+				if(modifyingOutputGate == null && selected == null && scrolling == false){
+					cuttingMode = true;
+					cutX = event.getX();
+					cutY = event.getY();
+				}
+
+				break;
 
 			case MotionEvent.ACTION_MOVE:
 
 				if(zooming) {
 					//Oh boy.
 					//Get new coordinates of pointers
-					float nt0x = (metrics.widthPixels/2)+event.getX(0);
-					float nt0y = (metrics.heightPixels/2)+event.getY(0);
-					float nt1x = (metrics.widthPixels/2)-event.getX(0);
-					float nt1y = (metrics.heightPixels/2)-event.getY(0);
-					
+					float nt0x = event.getX(0);
+					float nt0y = event.getY(0);
+					float nt1x = event.getX(1);
+					float nt1y = event.getY(1);
+
 					float distOld = (float)Math.sqrt(((t0x-t1x)*(t0x-t1x))+((t0y-t1y)*(t0y-t1y)));
 					float distNew = (float)Math.sqrt(((nt0x-nt1x)*(nt0x-nt1x))+((nt0y-nt1y)*(nt0y-nt1y)));
-					if(distNew!=distOld) {
-						double zr = 1.1;
+					if(Math.abs(distNew-distOld)>2 && (distOld != 0)) {
+						double zr = 1; //1.01 - 1.09
+						float z2 = zoom;
 						if(distNew>distOld) {
-							//This was a pinch, so zoom in
-							zoom = (float)(zoom*zr);
+							//This was not a pinch, so zoom in
+							z2 = (float)(zoom*(zr+(.09*((distNew-distOld)/15))));
 						} else if(distNew<distOld) {
-							zoom = (float)(zoom/zr);
+							z2= (float)(zoom/(zr+(.09*((distOld-distNew)/15))));
 						}
-						
+
 						//We now have to translate the canvas to center on the zoomed out-point
-						dx = (float)((nt0x+nt1x)/2.0)*(zoom-1);
-						dy = (float)((nt0y+nt1y)/2.0)*(zoom-1);
+
+						cx = (nt0x+nt1x)/2;
+						cy = (nt1y+nt0y)/2;
+
+						dx = (((cx*(z2-zoom))+(dx*z2))/zoom);
+						dy = (((cy*(z2-zoom))+(dy*z2))/zoom);;
+						zoom = z2;
 					}
-					
+
 					t0x = nt0x;
 					t0y = nt0y;
 					t1x = nt1x;
 					t1y = nt1y;
-				}
-				
+				} else {
+
 				if(cuttingMode) {
 					for(Gate g : gates){ 
 						g.deleteWires((cutX+dx)/zoom, (cutY+dy)/zoom, (event.getX()+dx)/zoom, (event.getY()+dy)/zoom);
@@ -322,12 +345,12 @@ public class Gateway extends Activity  {
 					float w = metrics.widthPixels;
 					if(d<w) d=w;
 					float ln = ((w/(float)d)*w);
-					
+
 					scrollX+=w*(event.getX()-sx)/(w-ln);
 					if(scrollX < 0) scrollX=0;
 					else if(scrollX > w) scrollX = w;
 					else sx = event.getX();
-					
+
 					mstart = (int)((scrollX/metrics.widthPixels)*(metrics.widthPixels-d));
 					if(mstart > 0) mstart = 0;
 				}
@@ -418,6 +441,7 @@ public class Gateway extends Activity  {
 					wireX = (event.getX()+dx)/zoom;
 					wireY = (event.getY()+dy)/zoom;
 				}
+				}
 				this.invalidate();
 				// finger moves on the screen
 				break;
@@ -468,9 +492,9 @@ public class Gateway extends Activity  {
 				this.invalidate();
 
 				break;
-				
+
 				//Two touch event (zooming)
-			case MotionEvent.ACTION_POINTER_DOWN:
+/*			case MotionEvent.ACTION_POINTER_DOWN:
 				//Another point was just touched, so disable everything
 				//This is probably unnecessary/wrong, but it'll do for now
 				cuttingMode = false;
@@ -479,25 +503,25 @@ public class Gateway extends Activity  {
 				selected = null;
 				modifyingOutputGate = null;
 				glowing = null;
-				
+
 				//Save the data of the first two touches
 				t0x = event.getX(0);
 				t1x = event.getX(1);
 				t0y = event.getY(0);
 				t1y = event.getY(1);
-				
+
 				//We're zooming now
-				zooming = true;
-				
+			//	zooming = true;
+
 				break;
 			case MotionEvent.ACTION_POINTER_UP:
 				zooming = false;
-				t0x = -1;
-				t1x = -1;
-				t0y = -1;
-				t1y = -1;
+				t0x = 0;
+				t1x = 0;
+				t0y = 0;
+				t1y = 0;
 				break;
-			}
+	*/		}
 
 			// tell the system that we handled the event and no further processing is required
 			return true;
