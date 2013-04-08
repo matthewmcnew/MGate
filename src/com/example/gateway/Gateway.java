@@ -274,13 +274,15 @@ public class Gateway extends Activity  {
 						break;
 					}
 				}	
-
-				// touch an exisiting one?
-				for(Gate g : gates){
-					if(g.inGate((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
-						select(g);
+				
+				if(menuItem == -2) {
+					// touch an exisiting one?
+					for(Gate g : gates){
+						if(g.inGate((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
+							select(g);
+						}
 					}
-				}					
+				}
 
 				this.invalidate();
 
@@ -304,24 +306,37 @@ public class Gateway extends Activity  {
 
 					float distOld = (float)Math.sqrt(((t0x-t1x)*(t0x-t1x))+((t0y-t1y)*(t0y-t1y)));
 					float distNew = (float)Math.sqrt(((nt0x-nt1x)*(nt0x-nt1x))+((nt0y-nt1y)*(nt0y-nt1y)));
-					if(Math.abs(distNew-distOld)>2 && (distOld != 0)) {
-						double zr = 1; //1.01 - 1.09
-						float z2 = zoom;
-						if(distNew>distOld) {
-							//This was not a pinch, so zoom in
-							z2 = (float)(zoom*(zr+(.09*((distNew-distOld)/15))));
-						} else if(distNew<distOld) {
-							z2= (float)(zoom/(zr+(.09*((distOld-distNew)/15))));
+					if(distOld != 0) {
+						if(Math.abs(distNew-distOld)>6) {
+							//Zooming
+							double zr = 1; //1.01 - 1.09
+							float z2 = zoom;
+							if(distNew>distOld) {
+								//This was not a pinch, so zoom in
+								z2 = (float)(zoom*(zr+(.09*((distNew-distOld)/15))));
+							} else if(distNew<distOld) {
+								z2= (float)(zoom/(zr+(.09*((distOld-distNew)/15))));
+							}
+
+							//We now have to translate the canvas to center on the zoomed out-point
+
+							cx = (nt0x+nt1x)/2;
+							cy = (nt1y+nt0y)/2;
+
+							dx = (((cx*(z2-zoom))+(dx*z2))/zoom);
+							dy = (((cy*(z2-zoom))+(dy*z2))/zoom);;
+							zoom = z2;
+						} else {
+							//Moving
+							cx = (nt0x+nt1x)/2;
+							cy = (nt1y+nt0y)/2;
+							
+							float cxOld = (t0x+t1x)/2;
+							float cyOld = (t0y+t1y)/2;
+
+							dx -= cx - cxOld;
+							dy -= cy - cyOld;
 						}
-
-						//We now have to translate the canvas to center on the zoomed out-point
-
-						cx = (nt0x+nt1x)/2;
-						cy = (nt1y+nt0y)/2;
-
-						dx = (((cx*(z2-zoom))+(dx*z2))/zoom);
-						dy = (((cy*(z2-zoom))+(dy*z2))/zoom);;
-						zoom = z2;
 					}
 
 					t0x = nt0x;
