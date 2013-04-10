@@ -184,12 +184,12 @@ public class Gateway extends Activity  {
 			Paint p = new Paint(Paint.FILTER_BITMAP_FLAG);
 			p.setStrokeWidth(2);
 
-			canvas.drawRect(0, 0, metrics.widthPixels+10, menu.get(1).getHeight()+30, paint);
+			canvas.drawRect(0, 0, metrics.widthPixels+10, menu.get(1).getHeight()+14, paint);
 
 			canvas.drawLine(0, menu.get(1).getHeight()+10,metrics.widthPixels+5, menu.get(1).getHeight()+10, p);
 
 			//Draw scrollbar
-			canvas.drawLine(0, menu.get(1).getHeight()+30,metrics.widthPixels+5, menu.get(1).getHeight()+30, p);
+			canvas.drawLine(0, menu.get(1).getHeight()+14,metrics.widthPixels+5, menu.get(1).getHeight()+14, p);
 
 			p.setFilterBitmap(true);
 			//p.setColorFilter(new LightingColorFilter(65280,0xFFFFFF));    //white
@@ -215,7 +215,7 @@ public class Gateway extends Activity  {
 			float w = metrics.widthPixels;
 			if(m<w) m=w;
 			float ln = ((w/(float)m)*w);
-			canvas.drawRoundRect(new RectF((scrollX/w)*(w-ln), menu.get(1).getHeight()+12, w-((w-scrollX)/w)*(w-ln), menu.get(1).getHeight()+28),8,8,p);
+			canvas.drawRect(new RectF((scrollX/w)*(w-ln), menu.get(1).getHeight()+11, w-((w-scrollX)/w)*(w-ln), menu.get(1).getHeight()+13),p);
 
 
 			if((selected != null)) {
@@ -278,7 +278,7 @@ public class Gateway extends Activity  {
 				}
 
 				//Scroll touch?
-				if(touchType == -1 && (event.getY() > menu.get(1).getHeight()+12) && (event.getY() < menu.get(1).getHeight()+30)) {
+				if((touchType == -1 || touchType == 1)&& /* (event.getY() > menu.get(1).getHeight()+12) &&*/ (event.getY() < menu.get(1).getHeight()+30)) {
 					scrolling = true;
 					sx = event.getX();
 					touchType = 2;
