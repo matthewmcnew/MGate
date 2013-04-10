@@ -13,7 +13,6 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -244,8 +243,10 @@ public class Gateway extends Activity  {
 
 			if(event.getPointerCount()>1) {
 				zooming = true;
-				if(selected != null)
+				if(selected != null) {
 					selected.flipSelected();
+					selected.setDeleting(false);
+				}
 				selected = null;
 				menuItem = -2;
 				cuttingMode = false;
@@ -352,7 +353,6 @@ public class Gateway extends Activity  {
 						touchType = 7;
 						
 						showAll = true;
-						int c = 0;
 						float   maxX = gates.get(0).getX(),
 								minX = gates.get(0).getX(),
 								maxY = gates.get(0).getY(),
@@ -362,8 +362,9 @@ public class Gateway extends Activity  {
 						tdy = 0;
 						tz = 0;
 						
+						// Calculate the collective midpoint of all gates
 						for(Gate g : gates) {
-							float x = g.getX()+(g.getBitmap().getWidth()/2);
+							float x = g.getX()+(g.getBitmap().getWidth());
 							float y = g.getY()+(g.getBitmap().getHeight()/2);
 							
 							if(x<minX)
@@ -384,19 +385,23 @@ public class Gateway extends Activity  {
 						tdx = (maxX+minX)/2;
 						tdy = (maxY+minY)/2;
 						
+						// Transform the coordinates in the canvas to the coordinates on the screen
 						maxX = ((maxX+dx)*zoom);
 						maxY = ((maxY+dy)*zoom);
 						minX = ((minX+dx)*zoom);
 						minY = ((minY+dy)*zoom);
 						
+						//Based on the current size of the display, calculate the zoom needed to fit everything
 						float tzx = (metrics.widthPixels/(maxX-minX))*zoom;
-						float tzy = ((metrics.heightPixels-30)/(maxY-minY))*zoom;
+						float tzy = ((metrics.heightPixels-200)/(maxY-minY))*zoom;
 						
 						tz = Math.min(tzx,tzy);
-																		
-						tdx = (tdx*tz)-(metrics.widthPixels/2); // tdx and tdy now correspond to the new dx and dy
+						
+						// Calculate a new dx and new dy to move the screen 
+						tdx = (tdx*tz)-(metrics.widthPixels/2);
 						tdy = (tdy*tz)-((metrics.heightPixels/2)+30);
 						
+						// ddx, ddy, and dz are the "step sizes" as the screen zooms and moves
 						ddx = (tdx - dx)/10;
 						ddy = (tdy - dy)/10;
 						dz = (tz - zoom)/10;
