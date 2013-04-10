@@ -70,7 +70,22 @@ public class Gateway extends Activity  {
 		float dy=0;
 		float cx=0;
 		float cy=0;
-
+		
+		//Show All stuff
+		boolean showAll = false;
+		boolean tap = false;
+		float tz = 0;    // Target zoom
+		float tdx = 0;   // Target dx
+		float tdy = 0;   // Target dy
+		int steps = 0;
+		float ddx =0;
+		float ddy = 0;
+		float dz = 0;
+		Thread showAllThd;
+		boolean canvas_ready = false;
+		
+		int touchType = -1;
+		
 		int menuItem = -2;
 
 		private Paint paint = new Paint();
@@ -91,16 +106,38 @@ public class Gateway extends Activity  {
 			gates.get(1).setInput(gates.get(0));
 			gates.get(2).setInput(gates.get(0));
 			this.invalidate();
+			
+			/* The idea here was to have a thread that we could stop and start.
+			 * Apparently you can't stop threads though, so it just runs all the time.
+			 */
+			showAllThd = new Thread(new Runnable() {
+				public void run() {
+					while(true){
+						if(showAll && canvas_ready) {
+							if(steps != 0) {
+								dx += ddx;
+								dy += ddy;
+								zoom += dz;
+								steps--;
+							} else {
+								showAll = false;
+							}
+							canvas_ready = false;
+							postInvalidate();
+						}
+						try {
+							Thread.sleep(5);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			});
+			showAllThd.start();
 		}
 
 		protected void onDraw(Canvas canvas) {
-			//			drawMenu(canvas);
-
-			paint.setColor(Color.BLACK);
-
-			canvas.drawLine(cx,cy-10,cx,cy+10, paint);
-			canvas.drawLine(cx-10,cy,cx+10,cy, paint);		
-
+			
 			canvas.translate(-dx,-dy);
 			canvas.scale(zoom,zoom);
 
@@ -138,6 +175,8 @@ public class Gateway extends Activity  {
 				d.drawWires(canvas);
 				d.draw(canvas,circles);
 			}
+			
+			canvas_ready = true;
 		}
 
 		private void drawMenu(Canvas canvas) {		 
@@ -203,9 +242,14 @@ public class Gateway extends Activity  {
 		public boolean onTouchEvent(MotionEvent event) {
 			int eventaction = event.getAction();
 
-			if(event.getPointerCount()>1)
+			if(event.getPointerCount()>1) {
 				zooming = true;
-			else {
+				if(selected != null)
+					selected.flipSelected();
+				selected = null;
+				menuItem = -2;
+				cuttingMode = false;
+			} else {
 				zooming = false;
 				t0x = 0;
 				t1x = 0;
@@ -215,6 +259,9 @@ public class Gateway extends Activity  {
 
 			switch (eventaction) {
 			case MotionEvent.ACTION_DOWN:
+				
+				touchType = -1;
+				
 				//menu touch?
 				int distance = mstart;
 				int count = -1;
@@ -222,6 +269,7 @@ public class Gateway extends Activity  {
 				for(Bitmap bitmap : menu){
 					if(event.getX() < ( bitmap.getWidth() + distance) && event.getX() > distance && event.getY() < bitmap.getHeight() ){
 						menuItem = count;
+						touchType = 1;
 						break;
 					}
 					distance = distance + bitmap.getWidth();
@@ -229,69 +277,150 @@ public class Gateway extends Activity  {
 				}
 
 				//Scroll touch?
-				if((event.getY() > menu.get(1).getHeight()+12) && (event.getY() < menu.get(1).getHeight()+28)) {
+				if(touchType == -1 && (event.getY() > menu.get(1).getHeight()+12) && (event.getY() < menu.get(1).getHeight()+30)) {
 					scrolling = true;
 					sx = event.getX();
+					touchType = 2;
 				}
 
-				// touch an input or output
-				for(Gate g : gates){
-					//This needs to be cleaned up someday.  
-					Gate testingGate = g.disconnectWire((event.getX()+dx)/zoom, (event.getY()+dy)/zoom);
-					if(testingGate != null) {
-						modifyingOutputGate = testingGate;
-						modifyingOutputGate.flipWiring();
-						g.clearInput(modifyingOutputGate);
+				if(touchType == -1) {
+					// touch an input or output
+					for(Gate g : gates){
+						//This needs to be cleaned up someday.  
+						Gate testingGate = g.disconnectWire((event.getX()+dx)/zoom, (event.getY()+dy)/zoom);
+						if(testingGate != null) {
+							modifyingOutputGate = testingGate;
+							modifyingOutputGate.flipWiring();
+							g.clearInput(modifyingOutputGate);
 
-						beginX = modifyingOutputGate.getOutputX();
-						beginY = modifyingOutputGate.getOutputY();
+							beginX = modifyingOutputGate.getOutputX();
+							beginY = modifyingOutputGate.getOutputY();
 
-						wireX = (event.getX()+dx)/zoom;
-						wireY = (event.getY()+dy)/zoom;
+							wireX = (event.getX()+dx)/zoom;
+							wireY = (event.getY()+dy)/zoom;
+							
+							touchType = 3;
+							
+							this.invalidate();
+							return true;
+						}
 
-						this.invalidate();
-						return true;
+						else if(g.inputFlip((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
+							
+							touchType = 4;
+							
+							this.invalidate();
+							break;
+						}
 
+						else if(g.outputTouched((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
+							
+							touchType = 5;
+							
+							g.flipWiring();
+							modifyingOutputGate = g;
+
+
+							beginX = g.getOutputX();
+							beginY = g.getOutputY();
+
+							wireX = (event.getX()+dx)/zoom;
+							wireY = (event.getY()+dy)/zoom;
+							this.invalidate();
+							break;
+						}
 					}
-
-					else if(g.inputFlip((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
-
-						this.invalidate();
-						break;
-					}
-
-					if(g.outputTouched((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
-						g.flipWiring();
-						modifyingOutputGate = g;
-
-
-						beginX = g.getOutputX();
-						beginY = g.getOutputY();
-
-						wireX = (event.getX()+dx)/zoom;
-						wireY = (event.getY()+dy)/zoom;
-						this.invalidate();
-						break;
-					}
-				}	
+				}
 				
-				if(menuItem == -2) {
+				if(touchType == -1) {
 					// touch an exisiting one?
 					for(Gate g : gates){
 						if(g.inGate((event.getX()+dx)/zoom, (event.getY()+dy)/zoom)){
 							select(g);
+							touchType = 6;
 						}
 					}
 				}
 
 				this.invalidate();
-
-				if(modifyingOutputGate == null && selected == null && scrolling == false){
+				
+				//Show All code
+				if(touchType == -1) {
+					if(tap && (System.nanoTime() < time + 300000000.0) && gates.size() > 0) {
+						//Double Tap, zoom out to show everything
+						
+						touchType = 7;
+						
+						showAll = true;
+						int c = 0;
+						float   maxX = gates.get(0).getX(),
+								minX = gates.get(0).getX(),
+								maxY = gates.get(0).getY(),
+								minY = gates.get(0).getY();
+						
+						tdx = 0;
+						tdy = 0;
+						tz = 0;
+						
+						for(Gate g : gates) {
+							float x = g.getX()+(g.getBitmap().getWidth()/2);
+							float y = g.getY()+(g.getBitmap().getHeight()/2);
+							
+							if(x<minX)
+								minX = x;
+							if(x>maxX)
+								maxX = x;
+							if(y<minY)
+								minY = y;
+							if(y>maxY)
+								maxY = y;
+						}
+						
+						minX -= menu.get(0).getWidth();
+						maxX += menu.get(0).getWidth();
+						minY -= menu.get(0).getHeight();
+						maxY += menu.get(0).getHeight();
+						
+						tdx = (maxX+minX)/2;
+						tdy = (maxY+minY)/2;
+						
+						maxX = ((maxX+dx)*zoom);
+						maxY = ((maxY+dy)*zoom);
+						minX = ((minX+dx)*zoom);
+						minY = ((minY+dy)*zoom);
+						
+						float tzx = (metrics.widthPixels/(maxX-minX))*zoom;
+						float tzy = ((metrics.heightPixels-30)/(maxY-minY))*zoom;
+						
+						tz = Math.min(tzx,tzy);
+																		
+						tdx = (tdx*tz)-(metrics.widthPixels/2); // tdx and tdy now correspond to the new dx and dy
+						tdy = (tdy*tz)-((metrics.heightPixels/2)+30);
+						
+						ddx = (tdx - dx)/10;
+						ddy = (tdy - dy)/10;
+						dz = (tz - zoom)/10;
+						
+						showAll = true;
+						tap = false;
+						steps = 10;
+					} else {
+						tap = false;
+					}
+				}
+				
+				if(touchType == -1){
 					cuttingMode = true;
 					cutX = event.getX();
 					cutY = event.getY();
-				}
 
+					//Show All code
+					tap = true;
+					time = System.nanoTime();
+					
+					touchType = 8;
+				}
+				
 				break;
 
 			case MotionEvent.ACTION_MOVE:
@@ -507,36 +636,7 @@ public class Gateway extends Activity  {
 				this.invalidate();
 
 				break;
-
-				//Two touch event (zooming)
-/*			case MotionEvent.ACTION_POINTER_DOWN:
-				//Another point was just touched, so disable everything
-				//This is probably unnecessary/wrong, but it'll do for now
-				cuttingMode = false;
-				scrolling = false;
-				menuItem = -2;
-				selected = null;
-				modifyingOutputGate = null;
-				glowing = null;
-
-				//Save the data of the first two touches
-				t0x = event.getX(0);
-				t1x = event.getX(1);
-				t0y = event.getY(0);
-				t1y = event.getY(1);
-
-				//We're zooming now
-			//	zooming = true;
-
-				break;
-			case MotionEvent.ACTION_POINTER_UP:
-				zooming = false;
-				t0x = 0;
-				t1x = 0;
-				t0y = 0;
-				t1y = 0;
-				break;
-	*/		}
+			}
 
 			// tell the system that we handled the event and no further processing is required
 			return true;
