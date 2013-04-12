@@ -1,4 +1,4 @@
-package com.example.gateway;
+package com.example.MGate;
 
 import java.util.ArrayList;
 import java.util.HashMap;

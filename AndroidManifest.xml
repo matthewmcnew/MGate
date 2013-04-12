@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.gateway"
+    package="com.example.MGate"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -8,11 +8,11 @@
         android:targetSdkVersion="15" />
 
     <application
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"  >
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         <activity
-            android:name=".Gateway"
+            android:name="com.example.MGate.Gateway"
             android:label="@string/title_activity_gateway" 
             android:screenOrientation="landscape">
             <intent-filter>
@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        />
     </application>
 
 </manifest>

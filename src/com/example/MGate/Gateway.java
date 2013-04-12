@@ -1,6 +1,8 @@
-package com.example.gateway;
+package com.example.MGate;
 
 import java.util.ArrayList;
+
+import com.example.MGate.R;
 
 import android.app.Activity;
 import android.content.Context;
@@ -364,7 +366,7 @@ public class Gateway extends Activity  {
 						
 						// Calculate the collective midpoint of all gates
 						for(Gate g : gates) {
-							float x = g.getX()+(g.getBitmap().getWidth());
+							float x = g.getX()+(g.getBitmap().getWidth()/1);
 							float y = g.getY()+(g.getBitmap().getHeight()/2);
 							
 							if(x<minX)
@@ -506,6 +508,7 @@ public class Gateway extends Activity  {
 
 
 				if(menuItem != -2 && (event.getY() > (menu.get(menuItem+1).getHeight()+menu.get(menuItem+1).getHeight()/2))){
+					scrolling = false;
 					Gate newGate = null;
 					switch(menuItem) {
 					case -1:
