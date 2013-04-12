@@ -20,7 +20,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
-public class Gateway extends Activity  {
+public class MGate extends Activity  {
 
 
 	@Override
