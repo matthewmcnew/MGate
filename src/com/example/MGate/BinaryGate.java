@@ -223,7 +223,7 @@ public class BinaryGate extends Gate{
 		if(eX > (x-35) && eX < (x+22) ){
 			if(eY > (y-5) && eY < (y+bitmap.getHeight()/2) ){
 				if(this != selected && !selected.inPath(this)) {
-					Gateway.p(selected);
+					MGate.p(selected);
 					input1 = selected;
 					return true;
 				}
