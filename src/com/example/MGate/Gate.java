@@ -64,7 +64,7 @@ public abstract class Gate {
 	}
 	
 	public void draw(Canvas c,ArrayList<Bitmap> circles) {
-		MGate.p("Drawing gate...");
+		Gateway.p("Drawing gate...");
 		paint.setStrokeWidth(3);
 		if(deleting) {
 			Paint p = new Paint(Paint.FILTER_BITMAP_FLAG);
@@ -87,12 +87,12 @@ public abstract class Gate {
 	}
 	
 	public float getOutputX() {
-		MGate.p("Getting output x...");
+		Gateway.p("Getting output x...");
 		 return x+bitmap.getWidth()-6;
 	}
 	
 	public float getOutputY() {
-		MGate.p("Getting output y...");
+		Gateway.p("Getting output y...");
 		 return y + bitmap.getHeight()/2;	
 	}
 	
